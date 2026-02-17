@@ -1,0 +1,27 @@
+{
+  "name": "upliftgym",
+  "version": "1.0.0",
+  "description": "Uplift Gym website scheduling and maintaining classes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcastro72/UpliftGym.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jcastro72/UpliftGym/issues"
+  },
+  "homepage": "https://github.com/jcastro72/UpliftGym#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.17.2"
+  }
+}
