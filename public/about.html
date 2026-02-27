@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Uplift Gym</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img src="images/uplift.png" alt="Uplift Gym logo" class="brand-logo" />
+        <span class="brand-name">Uplift Gym</span>
+      </a>
+
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="classes.html">Classes</a>
+        <a class="active" href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ABOUT HERO -->
+  <section class="about-hero">
+    <div class="container about-hero-inner">
+      <p class="about-kicker">Performance • Community • Consistency</p>
+      <h1 class="about-title">More than a gym.<br/>A commitment to yourself.</h1>
+      <p class="about-subtitle">
+        Uplift Gym is built for people who want real progress, with structure, support, and a community that keeps you going.
+      </p>
+
+      <div class="about-actions">
+        <a class="btn btn-primary" href="classes.html">View Classes</a>
+        <a class="btn btn-outline-dark" href="#story">Learn more</a>
+      </div>
+
+      <div class="about-stats">
+        <div class="about-stat">
+          <div class="about-stat-num">20</div>
+          <div class="about-stat-label">Spots per class</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">10+</div>
+          <div class="about-stat-label">Class options</div>
+        </div>
+        <div class="about-stat">
+          <div class="about-stat-num">Real</div>
+          <div class="about-stat-label">Results-focused</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="section" id="story">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-card">
+          <h2>Our Mission</h2>
+          <p>
+            At Uplift Gym, we believe real transformation doesn’t come from motivation alone, it comes from consistency.
+            We create classes that help you build strength, confidence, and long-term results.
+          </p>
+          <p>
+            Whether you're just starting or leveling up, we’re here to help you show up, train hard, and feel proud of your progress.
+          </p>
+        </div>
+
+        <div class="about-card about-highlight">
+          <h2>What Makes Uplift Different</h2>
+          <ul class="about-list">
+            <li><strong>Small groups:</strong> up to 20 people per class</li>
+            <li><strong>Structured training:</strong> sessions designed for progress</li>
+            <li><strong>Supportive community:</strong> motivated people around you</li>
+            <li><strong>Easy booking:</strong> pick your class and reserve your spot fast</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="section about-values">
+    <div class="container">
+      <div class="section-head">
+        <h2>Our Philosophy</h2>
+        <p>Strong body. Strong mind. Strong habits.</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <h3>Progress, not perfection</h3>
+          <p>We focus on consistency and small wins that add up over time.</p>
+        </div>
+        <div class="card">
+          <h3>Train with purpose</h3>
+          <p>Every class has structure so you know what you’re working toward.</p>
+        </div>
+        <div class="card">
+          <h3>Community matters</h3>
+          <p>You’ll feel supported, challenged, and motivated to keep going.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container cta-inner">
+      <div>
+        <h2>Ready to start?</h2>
+        <p>Choose a class and reserve your spot today.</p>
+      </div>
+      <a class="btn btn-primary" href="classes.html">View Classes</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Uplift Gym</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

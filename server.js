@@ -7,6 +7,11 @@ require('dotenv').config();
 
 // Create an instance of the Express application
 const app = express();
+
+// Serve the HTML files from the public folder
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+
 // Use CORS middleware to enable cross-origin requests
 app.use(cors());
 // Use built-in middleware to parse JSON request bodies
