@@ -5,6 +5,11 @@ const cors = require('cors');
 // Import dotenv to load variables from .env file into process.env
 require('dotenv').config();
 
+// Import route handlers for users, bookings, and classes
+const usersRoutes = require('./routes/usersRoutes');
+const bookingsRoutes = require('./routes/bookingsRoutes');
+const classRoutes = require('./routes/classRoutes');
+
 // Create an instance of the Express application
 const app = express();
 
@@ -16,6 +21,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 // Use built-in middleware to parse JSON request bodies
 app.use(express.json());
+
+// Use the imported route handlers for their respective routes
+app.use('/users', usersRoutes);
+app.use('/bookings', bookingsRoutes);
+app.use('/class', classRoutes);
 
 // Define a simple route to test the server
 app.get('/', (req, res) => {
