@@ -4,6 +4,9 @@
   "description": "Uplift Gym website scheduling and maintaining classes",
   "main": "index.js",
   "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "verify:stack": "bash scripts/verify-stack.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
