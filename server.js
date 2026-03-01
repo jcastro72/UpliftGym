@@ -10,8 +10,16 @@ const path = require('path');
 // Create an instance of the Express application
 const app = express();
 
+app.get('/server-test', (req, res) => {
+  res.send('Server is working');
+});
+
 // Serve the HTML files from the public folder
 app.use(express.static(path.join(__dirname, "public")));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Use CORS middleware to enable cross-origin requests
 const corsOrigin = process.env.CORS_ORIGIN;
