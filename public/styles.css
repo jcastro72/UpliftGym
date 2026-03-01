@@ -590,7 +590,7 @@ body{
 
 /* ================= CONFIRM PAGE ================= */
 
-.confirm-card{
+/* .confirm-card{
   max-width: 760px;
   margin: 0 auto;
   background: #fff;
@@ -635,7 +635,295 @@ body{
   margin-top: 16px;
   color: #94a3b8;
   font-size: 13px;
+} */
+
+/* =================== BOOKING PAGE ================= */
+
+/* Booking Container */
+.booking-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
+
+/* Card */
+.booking-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  margin-bottom: 40px;
+}
+
+/* Subtitle */
+.booking-subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 24px;
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--foreground);
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.close-btn:hover {
+  opacity: 0.6;
+}
+
+/* Form Sections */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.booking-card input,
+.booking-card select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-background);
+  font-size: 16px;
+}
+
+/* Two-column layout */
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Time Slot Buttons */
+.time-slot-list button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-align: left;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+.time-slot-list button:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+
+.time-slot-list button.selected {
+  border-color: var(--primary);
+  background: var(--muted);
+}
+
+.time-slot-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary Buttons */
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background 0.2s ease;
+  opacity: 1;
+  transform: none;
+}
+
+.primary-btn:disabled {
+  background: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.primary-btn:not(:disabled) {
+  background: var(--blue2);
+  color: white;
+}
+
+.primary-btn:not(:disabled):hover {
+  background: #005bb5;
+}
+
+/* Terms */
+.terms-text {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+/* ================= REVIEW PAGE ================= */
+
+/* Review Subtitle */
+.review-subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 20px;
+}
+
+/* Review Sections */
+.review-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.review-heading {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Review Actions */
+.review-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.secondary-btn:hover {
+  background: #d0d0d0;
+}
+
+/* ================= PAYMENT PAGE ================= */
+
+/* Payment Title */
+.payment-title {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.payment-subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 20px;
+}
+
+/* Payment Sections */
+.payment-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.payment-heading {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Payment Note */
+.payment-note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* Payment Buttons */
+.payment-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.secondary-btn:hover {
+  background: #d0d0d0;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.primary-btn:hover {
+  background: #005bb5;
+}
+
+/* ================= CONFIRMATION PAGE ================= */
+
+/* Confirmation Title */
+.confirm-title {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.confirm-subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 20px;
+}
+
+/* Confirmation Sections */
+.confirm-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.confirm-heading {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* Confirmation Actions */
+.confirm-actions {
+  margin-top: 20px;
+}
+
+.confirm-actions .primary-btn {
+  width: 100%;
+}
+
 
 /* ================= FOOTER ================= */
 .footer{
@@ -679,3 +967,4 @@ body{
     align-items: flex-start;
   }
 }
+
