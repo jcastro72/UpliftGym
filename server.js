@@ -7,6 +7,11 @@ require('dotenv').config();
 const mysql = require('mysql2');
 const path = require('path');
 
+// Import route handlers for users, bookings, and classes
+const usersRoutes = require('./routes/usersRoutes');
+const bookingsRoutes = require('./routes/bookingsRoutes');
+const classRoutes = require('./routes/classRoutes');
+
 // Create an instance of the Express application
 const app = express();
 
@@ -32,6 +37,10 @@ if (corsOrigin) {
 // Use built-in middleware to parse JSON request bodies
 app.use(express.json());
 
+// Use the imported route handlers for their respective routes
+app.use('/users', usersRoutes);
+app.use('/bookings', bookingsRoutes);
+app.use('/class', classRoutes);
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: Number(process.env.DB_PORT || 3306),
