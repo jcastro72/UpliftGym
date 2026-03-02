@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uplift Gym</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img src="images/uplift.png" alt="Uplift Gym logo" class="brand-logo" />
+        <span class="brand-name">Uplift Gym</span>
+      </a>
+
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="classes.html">Classes</a>
+        <a href="about.html">About</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- BOOKING APP WRAPPER -->
+  <div id="booking-app">
+
+    <!-- STEP 1: BOOKING FORM -->
+    <section id="step-form" class="booking-container">
+      <div class="booking-card">
+
+        <button class="close-btn" onclick="window.location.href='classes.html'">×</button>
+
+        <h1>Book Your Session</h1>
+        <p class="booking-subtitle">Fill out the form below to reserve your spot</p>
+
+        <!-- SESSION TYPE -->
+        <div class="form-section">
+          <label>Choose Fitness Session</label>
+          <select id="sessionType">
+            <option value="">Select a session...</option>
+            <option>Group Class - Yoga</option>
+            <option>Group Class - HIIT</option>
+            <option>Group Class - Pilates</option>
+            <option>Group Class - Spinning</option>
+            <option>Group Class - Strength Training</option>
+            <option>Group Class - Zumba</option>
+            <option>Group Class - Functional Training</option>
+            <option>Group Class - Boxing Fitness</option>
+            <option>Group Class - Mobility & Stretch</option>
+            <option>Group Class - Meditation</option>
+          </select>
+        </div>
+
+        <!-- DATE + TIME GRID -->
+        <div class="booking-grid">
+          <div>
+            <label>Select Date</label>
+            <input type="date" id="date">
+          </div>
+
+          <div>
+            <label>Select Time</label>
+            <div id="timeSlots" class="time-slot-list"></div>
+          </div>
+        </div>
+
+        <!-- PERSONAL INFO -->
+        <div class="form-section">
+          <label>Your Name</label>
+          <input type="text" id="name">
+
+          <label>Email</label>
+          <input type="email" id="email" placeholder="you@example.com">
+
+
+          <label>Phone</label>
+          <input type="tel" id="phone" inputmode="numeric" pattern="[0-9]*" placeholder="000-000-0000">
+        </div>
+
+        <button id="goReview" class="primary-btn" type="button" disabled>
+          Confirm Booking
+        </button>
+
+        <p class="terms-text">By booking, you agree to our terms and conditions.</p>
+
+      </div>
+    </section>
+
+    <!-- STEP 2: REVIEW -->
+    <section id="step-review" class="booking-card booking-container" style="display:none;">
+
+      <h1>Review Your Booking</h1>
+      <p class="review-subtitle">Please review the details and pricing before confirming</p>
+
+      <!-- Booking Details -->
+      <div class="review-section">
+        <h3 class="review-heading">📅 Booking Details</h3>
+        <p><strong>Session:</strong> <span id="revSession"></span></p>
+        <p><strong>Date:</strong> <span id="revDate"></span></p>
+        <p><strong>Time:</strong> <span id="revTime"></span></p>
+      </div>
+
+      <!-- User Info -->
+      <div class="review-section">
+        <h3 class="review-heading">👤 Your Information</h3>
+        <p><strong>Name:</strong> <span id="revName"></span></p>
+        <p><strong>Email:</strong> <span id="revEmail"></span></p>
+        <p><strong>Phone:</strong> <span id="revPhone"></span></p>
+      </div>
+
+      <!-- Pricing -->
+      <div class="review-section">
+        <h3 class="review-heading">⚙️ Pricing</h3>
+        <p><strong>Session Price:</strong> $<span id="revPrice"></span></p>
+        <p><strong>Tax (8%):</strong> $<span id="revTax"></span></p>
+        <p><strong>Total Amount:</strong> $<span id="revTotal"></span></p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="review-actions">
+        <button id="editBooking" class="secondary-btn">Edit Booking</button>
+        <button id="goPayment" class="primary-btn">Proceed to Payment</button>
+      </div>
+
+    </section>
+
+
+    <!-- STEP 3: PAYMENT -->
+    <section id="step-payment" class="booking-card booking-container" style="display:none;">
+
+      <h1 class="payment-title">🔒 Secure Payment</h1>
+      <p class="payment-subtitle">Your payment information is encrypted and secure.</p>
+
+      <!-- ORDER SUMMARY -->
+      <div class="payment-section">
+        <h3 class="payment-heading">Order Summary</h3>
+        <p><strong>Session:</strong> <span id="paySession"></span></p>
+        <p><strong>Price:</strong> $<span id="payPrice"></span></p>
+        <p><strong>Tax (8%):</strong> $<span id="payTax"></span></p>
+        <p><strong>Total:</strong> $<span id="payTotal"></span></p>
+      </div>
+
+      <!-- PAYMENT INFO -->
+      <div class="payment-section">
+        <h3 class="payment-heading">Payment Information</h3>
+
+        <label>Card Number</label>
+        <input id="cardNumber" maxlength="19" placeholder="1234 5678 9012 3456">
+
+        <label>Cardholder Name</label>
+        <input id="cardName" placeholder="John Doe">
+
+        <label>Expiry Date (MM/YY)</label>
+        <input id="expiry" maxlength="5" placeholder="MM/YY">
+
+        <label>CVV</label>
+        <input id="cvv" maxlength="4" placeholder="123">
+
+        <label>Billing ZIP Code</label>
+        <input id="billingZip" maxlength="5" placeholder="12345">
+
+        <p class="payment-note">Your payment information is securely encrypted.</p>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="payment-actions">
+        <button id="editBooking" class="secondary-btn">Back to Review</button>
+        <button id="completePayment" class="primary-btn">Complete Payment - $<span id="payBtnTotal"></span></button>
+      </div>
+
+    </section>
+
+
+    <!-- STEP 4: CONFIRMATION -->
+    <section id="step-confirmation" class="booking-card booking-container" style="display:none;">
+
+      <h1 class="confirm-title">🎉 Booking Confirmed!</h1>
+      <p class="confirm-subtitle">Your session has been successfully reserved.</p>
+
+      <!-- Confirmation Details -->
+      <div class="confirm-section">
+        <h3 class="confirm-heading">📅 Session Details</h3>
+        <p><strong>Session:</strong> <span id="confSession"></span></p>
+        <p><strong>Date:</strong> <span id="confDate"></span></p>
+        <p><strong>Time:</strong> <span id="confTime"></span></p>
+      </div>
+
+      <!-- User Info -->
+      <div class="confirm-section">
+        <h3 class="confirm-heading">👤 Your Information</h3>
+        <p><strong>Name:</strong> <span id="confName"></span></p>
+        <p><strong>Email:</strong> <span id="confEmail"></span></p>
+        <p><strong>Phone:</strong> <span id="confPhone"></span></p>
+      </div>
+
+      <!-- Pricing -->
+      <div class="confirm-section">
+        <h3 class="confirm-heading">💳 Payment Summary</h3>
+        <p><strong>Session Price:</strong> $<span id="confPrice"></span></p>
+        <p><strong>Tax (8%):</strong> $<span id="confTax"></span></p>
+        <p><strong>Total Paid:</strong> $<span id="confTotal"></span></p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="confirm-actions">
+        <button id="bookAnother" class="primary-btn">Book Another Session</button>
+      </div>
+
+    </section>
+
+
+  </div>
+
+  <script src="booking.js"></script>
+</body>
+</html>
