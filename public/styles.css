@@ -392,7 +392,7 @@ body{
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 22p  -000x;
+  padding: 22px;
   box-shadow: var(--shadow);
 }
 
@@ -588,7 +588,7 @@ body{
 
 /* ================= CONFIRM PAGE ================= */
 
-/* .confirm-card{
+.confirm-card{
   max-width: 760px;
   margin: 0 auto;
   background: #fff;
@@ -633,7 +633,7 @@ body{
   margin-top: 16px;
   color: #94a3b8;
   font-size: 13px;
-} */
+}
 
 /* =================== BOOKING PAGE ================= */
 

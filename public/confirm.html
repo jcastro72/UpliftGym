@@ -29,8 +29,8 @@
   <main class="section">
     <div class="container">
       <div class="section-head" style="text-align:center;">
-        <h2>You're all set!</h2>
-        <p>Plan selection confirmed. Next step: book your class.</p>
+        <h2>Plan Selected</h2>
+        <p>Your membership plan has been selected successfully.</p>
       </div>
 
       <div class="confirm-card">
@@ -59,34 +59,40 @@
   </footer>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-    const plans = {
-      single: {
-        title: "Single Class ($25)",
-        desc: "One-time class booking with live availability tracking."
-      },
-      starter: {
-        title: "Starter ($79/month)",
-        desc: "2 classes per week with real-time booking."
-      },
-      plus: {
-        title: "Plus ($119/month)",
-        desc: "4 classes per week with priority booking and basic member perks."
-      },
-      unlimited: {
-        title: "Unlimited ($159/month)",
-        desc: "Unlimited access with priority booking and exclusive member perks."
-      }
-    };
+  const plans = {
+    starter: {
+      title: "Starter Plan ($79/month)",
+      desc: "Includes 2 classes per week with real-time booking and access to available classes.",
+      buttonText: "Book Classes",
+      buttonHref: "classes.html"
+    },
+    plus: {
+      title: "Plus Plan ($119/month)",
+      desc: "Includes 4 classes per week with real-time booking and more weekly flexibility.",
+      buttonText: "Book Classes",
+      buttonHref: "classes.html"
+    },
+    unlimited: {
+      title: "Unlimited Plan ($159/month)",
+      desc: "Includes unlimited classes with real-time booking and access to available classes.",
+      buttonText: "Book Classes",
+      buttonHref: "classes.html"
+    }
+  };
 
-    const params = new URLSearchParams(window.location.search);
-    const planKey = params.get("plan") || "starter";
-    const selected = plans[planKey] || plans.starter;
+  const params = new URLSearchParams(window.location.search);
+  const planKey = params.get("plan") || "starter";
+  const selected = plans[planKey] || plans.starter;
 
-    document.getElementById("planTitle").textContent = selected.title;
-    document.getElementById("planDesc").textContent = selected.desc;
-  </script>
+  document.getElementById("planTitle").textContent = selected.title;
+  document.getElementById("planDesc").textContent = selected.desc;
+
+  const nextActionBtn = document.getElementById("nextActionBtn");
+  nextActionBtn.textContent = selected.buttonText;
+  nextActionBtn.href = selected.buttonHref;
+</script>
 
 </body>
 </html>
