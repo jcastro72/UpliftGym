@@ -111,7 +111,9 @@ document.addEventListener("DOMContentLoaded", function () {
       state,
       zip,
       email,
-      password
+      password,
+      membershipActive: false,
+      selectedPlan: null
     };
 
     users.push(newUser);
@@ -128,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (redirect) {
         window.location.href = `/public/${redirect.replace(/^\/+/, "")}`;
       } else {
-        window.location.href = "/public/confirm.html";
+        window.location.href = "/public/index.html";
       }
     }, 700);
   });

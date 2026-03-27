@@ -13,9 +13,6 @@ function logout() {
   localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("userEmail");
   localStorage.removeItem("loggedInUser");
-  localStorage.removeItem("selectedPlan");
-  localStorage.removeItem("selectedClass");
-  localStorage.removeItem("membershipActive");
   window.location.href = "/public/index.html";
 }
 
@@ -33,10 +30,10 @@ function renderAuthMenu() {
   if (user && isLoggedIn()) {
     loginLink.style.display = "none";
     userStatus.textContent = `Hi, ${user.firstName}`;
-    userStatus.style.display = "inline-block";
-    logoutBtn.style.display = "inline-block";
+    userStatus.style.display = "inline-flex";
+    logoutBtn.style.display = "inline-flex";
   } else {
-    loginLink.style.display = "inline-block";
+    loginLink.style.display = "inline-flex";
     userStatus.textContent = "";
     userStatus.style.display = "none";
     logoutBtn.style.display = "none";

@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!plan) {
     alert("You must select a plan first.");
-    window.location.href = "pricing.html";
+    window.location.href = "/public/pricing.html";
     return;
   }
 
   if (plan.key !== "single-class" && localStorage.getItem("membershipActive") !== "true") {
     alert("You need an active membership.");
-    window.location.href = "pricing.html";
+    window.location.href = "/public/pricing.html";
     return;
   }
 
@@ -42,8 +42,21 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(bookings));
     }
 
-    static getGroupTimes() {
-      return ["08:00 AM", "10:00 AM", "12:00 PM", "02:00 PM", "04:00 PM"];
+    static getGroupTimes(sessionType) {
+    const classSchedules = {
+      "Group Class - Yoga": ["08:00 AM", "06:00 PM"],
+      "Group Class - HIIT": ["10:00 AM", "05:00 PM"],
+      "Group Class - Pilates": ["09:00 AM", "07:00 PM"],
+      "Group Class - Spin": ["06:30 AM", "06:30 PM"],
+      "Group Class - Strength Training": ["12:00 PM", "07:30 PM"],
+      "Group Class - Zumba": ["05:30 PM"],
+      "Group Class - Functional Training": ["07:00 AM", "05:00 PM"],
+      "Group Class - Boxing Fitness": ["06:00 PM"],
+      "Group Class - Mobility & Stretch": ["08:30 AM"],
+      "Group Class - Meditation": ["07:30 PM"]
+    };
+
+    return classSchedules[sessionType] || [];
     }
 
     static getAvailableSpots(date, time, type) {
@@ -65,21 +78,25 @@ document.addEventListener("DOMContentLoaded", function () {
       return bookings.filter((b) => b.email === userEmail);
     }
 
+   static getWeekKey(dateString) {
+      const date = new Date(dateString + "T00:00:00");
+      const day = date.getDay();
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - day);
+
+      const year = weekStart.getFullYear();
+      const month = String(weekStart.getMonth() + 1).padStart(2, "0");
+      const dayNum = String(weekStart.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${dayNum}`;
+    }
+
     static getUserWeeklyBookings(date) {
       const userBookings = this.getUserBookings();
+      const selectedWeekKey = this.getWeekKey(date);
 
-      const selected = new Date(date + "T00:00:00");
-      const weekStart = new Date(selected);
-      weekStart.setDate(selected.getDate() - selected.getDay());
-      weekStart.setHours(0, 0, 0, 0);
-
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-      weekEnd.setHours(23, 59, 59, 999);
-
-      return userBookings.filter((b) => {
-        const d = new Date(b.date + "T00:00:00");
-        return d >= weekStart && d <= weekEnd;
+      return userBookings.filter((booking) => {
+        return this.getWeekKey(booking.date) === selectedWeekKey;
       }).length;
     }
   }
@@ -149,13 +166,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function calculatePricing() {
-    const base = 25;
-    const tax = base * 0.08;
-    const total = base + tax;
+    if (plan.key === "single-class") {
+      const base = 25;
+      const tax = base * 0.08;
+      const total = base + tax;
 
-    state.price = base;
-    state.tax = tax;
-    state.total = total;
+      state.price = base;
+      state.tax = tax;
+      state.total = total;
+    } else {
+      state.price = 0;
+      state.tax = 0;
+      state.total = 0;
+    }
   }
 
   function validateForm() {
@@ -208,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const slots = BookingManager.getGroupTimes();
+    const slots = BookingManager.getGroupTimes(state.sessionType);
 
     slots.forEach((slot) => {
       const spots = BookingManager.getAvailableSpots(state.date, slot, state.sessionType);
@@ -243,29 +266,72 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("revName").textContent = state.name;
     document.getElementById("revEmail").textContent = state.email;
     document.getElementById("revPhone").textContent = state.phone;
-    document.getElementById("revPrice").textContent = state.price.toFixed(2);
-    document.getElementById("revTax").textContent = state.tax.toFixed(2);
-    document.getElementById("revTotal").textContent = state.total.toFixed(2);
+
+    if (plan.key === "single-class") {
+      document.getElementById("revPrice").textContent = `$${state.price.toFixed(2)}`;
+      document.getElementById("revTax").textContent = `$${state.tax.toFixed(2)}`;
+      document.getElementById("revTotal").textContent = `$${state.total.toFixed(2)}`;
+    } else {
+      document.getElementById("revPrice").textContent = "Included in your membership";
+      document.getElementById("revTax").textContent = "Included";
+      document.getElementById("revTotal").textContent = "No additional charge";
+    }
   }
 
   function fillPaymentStep() {
     document.getElementById("paySession").textContent = state.sessionType;
-    document.getElementById("payPrice").textContent = state.price.toFixed(2);
-    document.getElementById("payTax").textContent = state.tax.toFixed(2);
-    document.getElementById("payTotal").textContent = state.total.toFixed(2);
-    document.getElementById("payBtnTotal").textContent = state.total.toFixed(2);
+
+    if (plan.key === "single-class") {
+      document.getElementById("payPrice").textContent = `$${state.price.toFixed(2)}`;
+      document.getElementById("payTax").textContent = `$${state.tax.toFixed(2)}`;
+      document.getElementById("payTotal").textContent = `$${state.total.toFixed(2)}`;
+      document.getElementById("payBtnTotal").textContent = state.total.toFixed(2);
+    } else {
+      document.getElementById("payPrice").textContent = "Included in your membership";
+      document.getElementById("payTax").textContent = "Included";
+      document.getElementById("payTotal").textContent = "No additional charge";
+      document.getElementById("payBtnTotal").textContent = "0.00";
+    }
   }
 
+
   function fillConfirmationStep() {
-    document.getElementById("confSession").textContent = state.sessionType;
-    document.getElementById("confDate").textContent = state.date;
-    document.getElementById("confTime").textContent = state.time;
-    document.getElementById("confName").textContent = state.name;
-    document.getElementById("confEmail").textContent = state.email;
-    document.getElementById("confPhone").textContent = state.phone;
-    document.getElementById("confPrice").textContent = state.price.toFixed(2);
-    document.getElementById("confTax").textContent = state.tax.toFixed(2);
-    document.getElementById("confTotal").textContent = state.total.toFixed(2);
+  document.getElementById("confSession").textContent = state.sessionType;
+  document.getElementById("confDate").textContent = state.date;
+  document.getElementById("confTime").textContent = state.time;
+  document.getElementById("confName").textContent = state.name;
+  document.getElementById("confEmail").textContent = state.email;
+  document.getElementById("confPhone").textContent = state.phone;
+
+  if (plan.key === "single-class") {
+    document.getElementById("confPrice").textContent = `$${state.price.toFixed(2)}`;
+    document.getElementById("confTax").textContent = `$${state.tax.toFixed(2)}`;
+    document.getElementById("confTotal").textContent = `$${state.total.toFixed(2)}`;
+  } else {
+    document.getElementById("confPrice").textContent = "Included in your membership";
+    document.getElementById("confTax").textContent = "Included";
+    document.getElementById("confTotal").textContent = "No additional charge";
+  }
+}
+
+  function finalizeBooking() {
+    if (!canBookMore(state.date)) {
+      alert("You reached your booking limit.");
+      return;
+    }
+
+    BookingManager.addBooking({
+      sessionType: state.sessionType,
+      date: state.date,
+      time: state.time,
+      name: state.name,
+      email: localStorage.getItem("userEmail"),
+      phone: state.phone
+    });
+
+    fillConfirmationStep();
+    showStep("confirmation");
+    updateRemainingText();
   }
 
   function loadInitialData() {
@@ -319,7 +385,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     calculatePricing();
     fillReviewStep();
-    showStep("review");
+
+    if (plan.key === "single-class") {
+      showStep("review");
+    } else {
+      showStep("review");
+    }
   });
 
   editBookingReviewBtn.addEventListener("click", function () {
@@ -327,8 +398,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   goPaymentBtn.addEventListener("click", function () {
-    fillPaymentStep();
-    showStep("payment");
+    if (plan.key === "single-class") {
+      fillPaymentStep();
+      showStep("payment");
+    } else {
+      finalizeBooking();
+    }
   });
 
   backToReviewBtn.addEventListener("click", function () {
@@ -352,7 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("cvv").addEventListener("input", function (e) {
-    e.target.value = e.target.value.replace(/\D/g, "").substring(0, 4);
+    e.target.value = e.target.value.replace(/\D/g, "").substring(0, 3);
   });
 
   document.getElementById("billingZip").addEventListener("input", function (e) {
@@ -381,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    if (!/^\d{3,4}$/.test(cvv)) {
+    if (!/^\d{3}$/.test(cvv)) {
       alert("Please enter a valid CVV.");
       return;
     }
@@ -391,27 +466,11 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    if (!canBookMore(state.date)) {
-      alert("You reached your booking limit.");
-      return;
-    }
-
-    BookingManager.addBooking({
-      sessionType: state.sessionType,
-      date: state.date,
-      time: state.time,
-      name: state.name,
-      email: state.email,
-      phone: state.phone
-    });
-
-    fillConfirmationStep();
-    showStep("confirmation");
-    updateRemainingText();
+    finalizeBooking();
   });
 
   bookAnotherBtn.addEventListener("click", function () {
-    window.location.href = "classes.html";
+    window.location.href = "/public/classes.html";
   });
 
   loadInitialData();

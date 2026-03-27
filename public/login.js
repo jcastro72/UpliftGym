@@ -92,6 +92,14 @@ document.addEventListener("DOMContentLoaded", function () {
     localStorage.setItem("userEmail", user.email);
     localStorage.setItem("loggedInUser", JSON.stringify(user));
 
+    if (user.selectedPlan) {
+      localStorage.setItem("selectedPlan", JSON.stringify(user.selectedPlan));
+    }
+
+    if (user.membershipActive) {
+      localStorage.setItem("membershipActive", "true");
+    }
+
     loginMessage.textContent = "Login successful!";
     loginMessage.style.color = "green";
 

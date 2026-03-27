@@ -5,24 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Confirmation - Uplift Gym</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="auth.js"></script>
 </head>
 <body>
 
   <header class="header">
     <div class="container header-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/public/index.html">
         <img src="images/uplift.png" alt="Uplift Gym logo" class="brand-logo" />
         <span class="brand-name">Uplift Gym</span>
       </a>
 
       <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="classes.html">Classes</a>
-        <a href="about.html">About</a>
-        <a href="pricing.html">Pricing</a>
-         <a id="loginNavLink" href="login.html">Login</a>
-        <span id="userStatus" style="display:none; font-weight:700; margin-left:8px;"></span>
-        <button id="logoutBtn" onclick="logout()" class="btn btn-dark" style="display:none; margin-left:8px;">Logout</button>
+        <a href="/public/index.html">Home</a>
+        <a href="/public/classes.html">Classes</a>
+        <a href="/public/about.html">About</a>
+        <a href="/public/pricing.html">Pricing</a>
+        <a id="loginNavLink" href="/public/login.html">Login</a>
+        <span id="userStatus" class="user-status" style="display:none;"></span>
+        <button id="logoutBtn" onclick="logout()" class="btn btn-dark user-logout" style="display:none;">Logout</button>
       </nav>
     </div>
   </header>
@@ -30,8 +31,8 @@
   <main class="section">
     <div class="container">
       <div class="section-head" style="text-align:center;">
-        <h2>Payment Successful</h2>
-        <p>Your purchase has been completed successfully.</p>
+        <h2 id="pageTitle">Confirmation</h2>
+        <p id="pageSubtitle">Your status is shown below.</p>
       </div>
 
       <div class="confirm-card">
@@ -41,13 +42,9 @@
         <p id="planDesc" class="confirm-sub"></p>
 
         <div class="confirm-actions">
-          <a class="btn btn-primary" href="classes.html">Book a Class</a>
-          <a class="btn btn-outline-dark" href="pricing.html">Back to Pricing</a>
+          <a class="btn btn-primary" href="/public/classes.html">Book a Class</a>
+          <a class="btn btn-outline-dark" href="/public/pricing.html">Back to Pricing</a>
         </div>
-
-        <p class="confirm-note">
-          This is a demo confirmation. No real payment was processed.
-        </p>
       </div>
     </div>
   </main>
@@ -59,29 +56,39 @@
   </footer>
 
   <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderAuthMenu();
 
-  const plan = JSON.parse(localStorage.getItem("selectedPlan"));
+    const plan = JSON.parse(localStorage.getItem("selectedPlan"));
+    const membershipActive = localStorage.getItem("membershipActive");
 
-  if (!plan) {
-    document.getElementById("planTitle").textContent = "No plan selected";
-  } else {
-    document.getElementById("planTitle").textContent = plan.name;
-    document.getElementById("planDesc").textContent =
-      `${plan.price} • ${plan.description}`;
-  }
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
+    const planTitle = document.getElementById("planTitle");
+    const planDesc = document.getElementById("planDesc");
+
+    if (!plan) {
+      pageTitle.textContent = "No Plan Selected";
+      pageSubtitle.textContent = "Please choose a plan before continuing.";
+      planTitle.textContent = "No plan selected";
+      planDesc.textContent = "Go back to the pricing page and choose a plan.";
+    } else if (plan.key === "single-class") {
+      pageTitle.textContent = "Payment Successful";
+      pageSubtitle.textContent = "Your purchase has been completed successfully.";
+      planTitle.textContent = plan.name;
+      planDesc.textContent = `${plan.price} • ${plan.description}`;
+    } else if (membershipActive === "true") {
+      pageTitle.textContent = "Payment Successful";
+      pageSubtitle.textContent = "Your purchase has been completed successfully.";
+      planTitle.textContent = plan.name;
+      planDesc.textContent = `${plan.price} • ${plan.description}`;
+    } else {
+      pageTitle.textContent = "Payment Required";
+      pageSubtitle.textContent = "Your membership is not active yet.";
+      planTitle.textContent = plan.name;
+      planDesc.textContent = "Please complete payment before booking classes.";
+    }
   </script>
-
-  <script src="auth.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      renderAuthMenu();
-    });
-  </script>
-  <script src="auth.js"></script>
-<script>
-  requireAuth();
-</script>
 
 </body>
 </html>

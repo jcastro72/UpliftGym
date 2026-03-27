@@ -243,8 +243,27 @@
       }
 
       if (plan.key !== "single-class") {
-        localStorage.setItem("membershipActive", "true");
-      }
+      localStorage.setItem("membershipActive", "true");
+
+      const users = JSON.parse(localStorage.getItem("upliftgym_users") || "[]");
+      const email = localStorage.getItem("userEmail");
+
+      const updatedUsers = users.map(user => {
+        if (user.email === email) {
+          return {
+            ...user,
+            membershipActive: true,
+            selectedPlan: plan
+          };
+        }
+        return user;
+      });
+
+  localStorage.setItem("upliftgym_users", JSON.stringify(updatedUsers));
+
+  const currentUser = updatedUsers.find(u => u.email === email);
+  localStorage.setItem("loggedInUser", JSON.stringify(currentUser));
+}
 
       window.location.href = "confirm.html";
     });

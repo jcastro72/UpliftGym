@@ -73,16 +73,22 @@ body {
 
 .nav {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
   color: var(--text);
   padding: 8px 12px;
   border-radius: 10px;
   transition: 0.2s;
+  height: 42px;
+  line-height: 1;
 }
 
 .nav a:hover {
@@ -92,6 +98,26 @@ body {
 .nav a.active {
   background: var(--text);
   color: #fff;
+}
+
+.user-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  height: 42px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--text);
+  margin-left: 0;
+}
+
+.user-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  margin-left: 0;
 }
 
 /* ================= HERO ================= */
