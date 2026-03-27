@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
@@ -21,22 +20,24 @@
         <a href="classes.html">Classes</a>
         <a href="about.html">About</a>
         <a href="pricing.html">Pricing</a>
+         <a id="loginNavLink" href="login.html">Login</a>
+        <span id="userStatus" style="display:none; font-weight:700; margin-left:8px;"></span>
+        <button id="logoutBtn" onclick="logout()" class="btn btn-dark" style="display:none; margin-left:8px;">Logout</button>
       </nav>
     </div>
   </header>
 
-  <!-- CONFIRM -->
   <main class="section">
     <div class="container">
       <div class="section-head" style="text-align:center;">
-        <h2>Plan Selected</h2>
-        <p>Your membership plan has been selected successfully.</p>
+        <h2>Payment Successful</h2>
+        <p>Your purchase has been completed successfully.</p>
       </div>
 
       <div class="confirm-card">
         <p class="confirm-pill">Confirmation</p>
 
-        <h3 id="planTitle" class="confirm-title">Selected Plan</h3>
+        <h3 id="planTitle" class="confirm-title"></h3>
         <p id="planDesc" class="confirm-sub"></p>
 
         <div class="confirm-actions">
@@ -45,13 +46,12 @@
         </div>
 
         <p class="confirm-note">
-          Demo note: This is a front-end confirmation screen for the Capstone prototype (no payment processed).
+          This is a demo confirmation. No real payment was processed.
         </p>
       </div>
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <p>© <span id="year"></span> Uplift Gym</p>
@@ -61,37 +61,26 @@
   <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const plans = {
-    starter: {
-      title: "Starter Plan ($79/month)",
-      desc: "Includes 2 classes per week with real-time booking and access to available classes.",
-      buttonText: "Book Classes",
-      buttonHref: "classes.html"
-    },
-    plus: {
-      title: "Plus Plan ($119/month)",
-      desc: "Includes 4 classes per week with real-time booking and more weekly flexibility.",
-      buttonText: "Book Classes",
-      buttonHref: "classes.html"
-    },
-    unlimited: {
-      title: "Unlimited Plan ($159/month)",
-      desc: "Includes unlimited classes with real-time booking and access to available classes.",
-      buttonText: "Book Classes",
-      buttonHref: "classes.html"
-    }
-  };
+  const plan = JSON.parse(localStorage.getItem("selectedPlan"));
 
-  const params = new URLSearchParams(window.location.search);
-  const planKey = params.get("plan") || "starter";
-  const selected = plans[planKey] || plans.starter;
+  if (!plan) {
+    document.getElementById("planTitle").textContent = "No plan selected";
+  } else {
+    document.getElementById("planTitle").textContent = plan.name;
+    document.getElementById("planDesc").textContent =
+      `${plan.price} • ${plan.description}`;
+  }
+  </script>
 
-  document.getElementById("planTitle").textContent = selected.title;
-  document.getElementById("planDesc").textContent = selected.desc;
-
-  const nextActionBtn = document.getElementById("nextActionBtn");
-  nextActionBtn.textContent = selected.buttonText;
-  nextActionBtn.href = selected.buttonHref;
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderAuthMenu();
+    });
+  </script>
+  <script src="auth.js"></script>
+<script>
+  requireAuth();
 </script>
 
 </body>
