@@ -1,34 +1,66 @@
-//Temporary in-memory storage for users (replace with a database later)
-const users = [];
+const db = require('../db');
 
+// GET all users
 function getAllUsers(req, res) {
-    res.json(users);
+  db.query('SELECT * FROM users', (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(results);
+  });
 }
 
+// CREATE user
 function createUser(req, res) {
-    //Accept user name and email from frontend 
-    const { name, email } = req.body;
+  const { first_name, last_name, email, password } = req.body;
 
-    if (!name || !email) {
-    return res.status(400).json({ error: "Name and email are required" });
-}
+  if (!first_name || !last_name || !email || !password) {
+    return res.status(400).json({ error: "All fields required" });
+  }
 
-    //Check if user with the same email already exists
-    const existingUser = users.find(u => u.email === email);
+  const sql = `
+    INSERT INTO users (first_name, last_name, email, password)
+    VALUES (?, ?, ?, ?)
+  `;
 
-    if (existingUser) {
-        return res.status(400).json({ error: "User with this email already exists." });
+  db.query(sql, [first_name, last_name, email, password], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
     }
 
-    // Mock database ID generation (replace with actual database ID generation later)
-    const userId = users.length + 1;
-
-    const createdUser = { userId, name, email };
-    users.push(createdUser);
-
-    console.log(`User created: ${name} (${email})`);
-
-    res.json(createdUser);  
+    res.json({
+      user_ID: result.insertId,
+      first_name,
+      last_name,
+      email
+    });
+  });
 }
 
-module.exports = { getAllUsers, createUser };
+// LOGIN user
+function loginUser(req, res) {
+  const { email, password } = req.body;
+
+  const sql = 'SELECT * FROM users WHERE email = ?';
+
+  db.query(sql, [email], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (results.length === 0) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const user = results[0];
+
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    res.json({
+      message: "Login successful",
+      user
+    });
+  });
+}
+
+module.exports = { getAllUsers, createUser, loginUser };

@@ -1,38 +1,63 @@
-//Temporary in-memory storage for bookings (replace with a database later)
-const bookings = [];
+// bookingsController.js
+// Handles booking classes for users
 
-// Temporary in-memory storage for classes (replace with a database later)
-const classes = [
-    {id: 1, name: 'Yoga', trainer: 'John' },
-    {id: 2, name: 'Strength Training', trainer: 'Jane' },
-];
+const db = require('../db'); // Import the database connection
 
-const Max_Capacity = 20; // Maximum capacity for each class
+/**
+ * Middleware: Book a class
+ * @param req.body.class_ID - The ID of the class the user wants to book
+ * @param req.user.id - The logged-in user's ID (from session or JWT)
+ */
+const bookClass = (req, res) => {
+  const user_ID = req.user.id; // Get user_ID from the authenticated session/JWT
+  const { class_ID } = req.body; // Get class_ID from the request body
 
-function bookClass(req, res) {
-    const { classId, userId } = req.body;
-    //check if class exists 
-    const selectedClass = classes.find(c => c.id === classId);
-    if (!selectedClass) {
-        return res.status(404).json({message: 'class not found'});
+  if (!class_ID) {
+    return res.status(400).json({
+      ok: false,
+      message: 'class_ID is required'
+    });
+  }
+
+  // Step 1: Check if the class exists
+  const checkClassQuery = 'SELECT * FROM classes WHERE class_ID = ?';
+  db.query(checkClassQuery, [class_ID], (err, classResults) => {
+    if (err) return res.status(500).json({ ok: false, message: 'Database error' });
+    if (classResults.length === 0) {
+      return res.status(404).json({ ok: false, message: 'Class not found' });
     }
 
-    //Count current bookings for the class
-    const currentBookings = bookings.filter(b => b.classId === classId).length;
-    if (currentBookings >= Max_Capacity) {
-        return res.status(400).json({message: 'class is fully booked'});
-    }
+    const selectedClass = classResults[0];
 
-    const alreadyBooked = bookings.find(b => b.userId === userId && b.classId === classId);
-    if (alreadyBooked) {
-        return res.status(400).json({message: 'user has already booked this class'})
-    }
+    // Step 2: Check current number of bookings for the class
+    const countBookingsQuery = 'SELECT COUNT(*) AS current FROM bookings WHERE class_ID = ?';
+    db.query(countBookingsQuery, [class_ID], (err, countResults) => {
+      if (err) return res.status(500).json({ ok: false, message: 'Database error' });
 
-    bookings.push({ userId, classId });
+      if (countResults[0].current >= selectedClass.max_capacity) {
+        return res.status(400).json({ ok: false, message: 'Class is full' });
+      }
 
-    // Here you would normally save the booking to a database
-    console.log(`User ${userId} booked class ${classId}`);
+      // Step 3: Check if the user has already booked this class
+      const checkUserBookingQuery = 'SELECT * FROM bookings WHERE user_ID = ? AND class_ID = ?';
+      db.query(checkUserBookingQuery, [user_ID, class_ID], (err, userBookingResults) => {
+        if (err) return res.status(500).json({ ok: false, message: 'Database error' });
+        if (userBookingResults.length > 0) {
+          return res.status(400).json({ ok: false, message: 'You have already booked this class' });
+        }
 
-    res.json({ message: 'Class booked successfully!' });
-}
-module.exports = { bookClass };
+        // Step 4: Insert the booking
+        const insertBookingQuery = 'INSERT INTO bookings (user_ID, class_ID) VALUES (?, ?)';
+        db.query(insertBookingQuery, [user_ID, class_ID], (err) => {
+          if (err) return res.status(500).json({ ok: false, message: 'Booking failed' });
+
+          res.json({ ok: true, message: 'Class booked successfully' });
+        });
+      });
+    });
+  });
+};
+
+module.exports = {
+  bookClass
+};
