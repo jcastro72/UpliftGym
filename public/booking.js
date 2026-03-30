@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!plan) {
     alert("You must select a plan first.");
-    window.location.href = "/public/pricing.html";
+    window.location.href = "/pricing.html";
     return;
   }
 
   if (plan.key !== "single-class" && localStorage.getItem("membershipActive") !== "true") {
     alert("You need an active membership.");
-    window.location.href = "/public/pricing.html";
+    window.location.href = "/pricing.html";
     return;
   }
 
@@ -470,7 +470,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   bookAnotherBtn.addEventListener("click", function () {
-    window.location.href = "/public/classes.html";
+    window.location.href = "/classes.html";
   });
 
   loadInitialData();

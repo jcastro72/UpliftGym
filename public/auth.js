@@ -5,7 +5,7 @@ function isLoggedIn() {
 function requireAuth() {
   if (!isLoggedIn()) {
     const currentPage = window.location.pathname.split("/").pop();
-    window.location.href = `/public/login.html?redirect=${encodeURIComponent(currentPage)}`;
+    window.location.href = `/login.html?redirect=${encodeURIComponent(currentPage)}`;
   }
 }
 
@@ -13,7 +13,7 @@ function logout() {
   localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("userEmail");
   localStorage.removeItem("loggedInUser");
-  window.location.href = "/public/index.html";
+  window.location.href = "/index.html";
 }
 
 function renderAuthMenu() {

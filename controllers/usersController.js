@@ -12,18 +12,18 @@ function getAllUsers(req, res) {
 
 // CREATE user
 function createUser(req, res) {
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, dob, street, city, state, zip, phone } = req.body;
 
   if (!first_name || !last_name || !email || !password) {
-    return res.status(400).json({ error: "All fields required" });
+    return res.status(400).json({ error: "All required fields must be filled" });
   }
 
   const sql = `
-    INSERT INTO users (first_name, last_name, email, password)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO users (first_name, last_name, email, password, dob, street, city, state, zip, phone)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [first_name, last_name, email, password], (err, result) => {
+  db.query(sql, [first_name, last_name, email, password, dob, street, city, state, zip, phone], (err, result) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -32,7 +32,13 @@ function createUser(req, res) {
       user_ID: result.insertId,
       first_name,
       last_name,
-      email
+      email,
+      dob,
+      street,
+      city,
+      state,
+      zip,
+      phone
     });
   });
 }
