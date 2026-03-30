@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account - Uplift Gym</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <img src="images/uplift.png" alt="Uplift Gym logo" class="brand-logo" />
+        <span class="brand-name">Uplift Gym</span>
+      </a>
+
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="classes.html">Classes</a>
+        <a href="about.html">About</a>
+        <a href="pricing.html">Pricing</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section-head" style="text-align:center;">
+        <h2>Create Account</h2>
+        <p>Register to continue with booking and payments.</p>
+      </div>
+
+      <div class="confirm-card" style="max-width: 760px;">
+        <form id="signupForm">
+          <div class="form-section">
+            <label for="firstName"><strong>First Name *</strong></label>
+            <input type="text" id="firstName" placeholder="First name" required />
+
+            <label for="lastName"><strong>Last Name *</strong></label>
+            <input type="text" id="lastName" placeholder="Last name" required />
+
+            <label for="dob"><strong>Date of Birth *</strong></label>
+            <input type="date" id="dob" required />
+
+            <label for="street"><strong>Street *</strong></label>
+            <input type="text" id="street" placeholder="123 Main St" required />
+
+            <label for="city"><strong>City *</strong></label>
+            <input type="text" id="city" placeholder="Orlando" required />
+
+            <label for="state"><strong>State *</strong></label>
+            <input type="text" id="state" maxlength="2" placeholder="FL" required />
+
+            <label for="zip"><strong>ZIP Code *</strong></label>
+            <input type="text" id="zip" maxlength="5" placeholder="12345" required />
+
+            <label for="email"><strong>Email *</strong></label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+
+            <label for="password"><strong>Password *</strong></label>
+            <input type="password" id="password" placeholder="Create a password" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+        </form>
+
+        <p id="signupMessage" class="confirm-note" style="margin-top: 14px;"></p>
+
+        <div class="confirm-actions" style="margin-top: 18px;">
+          <a id="loginLink" class="btn btn-outline-dark" href="/public/login.html">Back to Login</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© <span id="year"></span> Uplift Gym</p>
+    </div>
+  </footer>
+
+  <script src="signup.js"></script>
+</body>
+</html>

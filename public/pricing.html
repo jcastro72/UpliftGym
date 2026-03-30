@@ -21,6 +21,9 @@
         <a href="classes.html">Classes</a>
         <a href="about.html">About</a>
         <a class="active" href="pricing.html">Pricing</a>
+        <a id="loginNavLink" href="/public/login.html">Login</a>
+        <span id="userStatus" class="user-status" style="display:none;"></span>
+        <button id="logoutBtn" onclick="logout()" class="btn btn-dark user-logout" style="display:none;">Logout</button>
       </nav>
     </div>
   </header>
@@ -44,13 +47,12 @@
 
           <ul class="price-list">
             <li>1 class booking</li>
-            <li>Live availability tracking</li>
+            <li>Real-time booking</li>
             <li>Access to available classes</li>
-            <li class="muted">No weekly credits</li>
-            <li class="muted">No priority booking</li>
+            <li>One-time payment</li>
           </ul>
 
-          <a class="btn btn-dark price-btn" href="confirm.html?plan=single">Select</a>
+          <button class="btn btn-dark price-btn" onclick="selectPlan('single-class')">Select</button>
         </div>
 
         <!-- Starter -->
@@ -62,12 +64,11 @@
           <ul class="price-list">
             <li>2 classes per week</li>
             <li>Real-time booking</li>
-            <li>Access to all class types</li>
-            <li class="muted">No priority booking</li>
-            <li class="muted">No member perks</li>
+            <li>Access to available classes</li>
+            <li>Best for beginners</li>
           </ul>
 
-          <a class="btn btn-dark price-btn" href="confirm.html?plan=starter">Select</a>
+          <button class="btn btn-dark price-btn" onclick="selectPlan('starter')">Select</button>
         </div>
 
         <!-- Plus -->
@@ -80,12 +81,11 @@
           <ul class="price-list">
             <li>4 classes per week</li>
             <li>Real-time booking</li>
-            <li>Access to all class types</li>
-            <li>Priority booking</li>
-            <li>Basic member perks</li>
+            <li>Access to available classes</li>
+            <li>More weekly flexibility</li>
           </ul>
 
-          <a class="btn btn-primary price-btn" href="confirm.html?plan=plus">Select</a>
+          <button class="btn btn-primary price-btn" onclick="selectPlan('plus')">Select</button>
         </div>
 
         <!-- Unlimited -->
@@ -96,12 +96,12 @@
 
           <ul class="price-list">
             <li>Unlimited access</li>
-            <li>Priority booking</li>
-            <li>Access to all class types</li>
-            <li>Exclusive member perks</li>
+            <li>Real-time booking</li>
+            <li>Access to available classes</li>
+            <li>Ideal for frequent training</li>
           </ul>
 
-          <a class="btn btn-dark price-btn" href="confirm.html?plan=unlimited">Select</a>
+          <button class="btn btn-dark price-btn" onclick="selectPlan('unlimited')">Select</button>
         </div>
 
       </div>
@@ -115,8 +115,57 @@
     </div>
   </footer>
 
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const planDetails = {
+  starter: {
+    key: "starter",
+    name: "Starter Plan",
+    price: "$79/month",
+    description: "2 classes per week"
+  },
+  plus: {
+    key: "plus",
+    name: "Plus Plan",
+    price: "$119/month",
+    description: "4 classes per week"
+  },
+  unlimited: {
+    key: "unlimited",
+    name: "Unlimited Plan",
+    price: "$159/month",
+    description: "Unlimited classes"
+  },
+  "single-class": {
+    key: "single-class",
+    name: "Single Class",
+    price: "$25",
+    description: "One class booking"
+  }
+};
+
+function selectPlan(planKey) {
+  const plan = planDetails[planKey];
+
+  localStorage.setItem("selectedPlan", JSON.stringify(plan));
+  localStorage.removeItem("membershipActive");
+
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  if (!isLoggedIn) {
+    window.location.href = `login.html?redirect=payment.html`;
+    return;
+  }
+
+  window.location.href = "payment.html";
+}
+</script>
+<script src="auth.js"></script>
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    document.addEventListener("DOMContentLoaded", function () {
+      renderAuthMenu();
+    });
   </script>
 </body>
 </html>

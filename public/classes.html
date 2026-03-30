@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
@@ -18,14 +17,16 @@
 
       <nav class="nav">
         <a href="index.html">Home</a>
+        <a class="active" href="classes.html">Classes</a>
         <a href="about.html">About</a>
         <a href="pricing.html">Pricing</a>
-        <a class="active" href="classes.html">Classes</a>
+        <a id="loginNavLink" href="/public/login.html">Login</a>
+        <span id="userStatus" class="user-status" style="display:none;"></span>
+        <button id="logoutBtn" onclick="logout()" class="btn btn-dark user-logout" style="display:none;">Logout</button>
       </nav>
     </div>
   </header>
 
-  <!-- PAGE -->
   <main class="section">
     <div class="container">
       <div class="section-head">
@@ -35,103 +36,93 @@
 
       <div class="class-grid">
 
-        <!-- Yoga -->
         <article class="class-card">
           <img class="class-img" src="images/yoga.png" alt="Yoga">
           <div class="class-body">
             <h3>Yoga</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Yoga')">Book</button>
           </div>
         </article>
 
-        <!-- HIIT -->
         <article class="class-card">
           <img class="class-img" src="images/hiit.png" alt="HIIT">
           <div class="class-body">
             <h3>HIIT</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('HIIT')">Book</button>
           </div>
         </article>
 
-        <!-- Pilates -->
         <article class="class-card">
           <img class="class-img" src="images/pilates.png" alt="Pilates">
           <div class="class-body">
             <h3>Pilates</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Pilates')">Book</button>
           </div>
         </article>
 
-        <!-- Spin -->
         <article class="class-card">
           <img class="class-img" src="images/spin.png" alt="Spin">
           <div class="class-body">
             <h3>Spin</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Spin')">Book</button>
           </div>
         </article>
 
-        <!-- Strength -->
         <article class="class-card">
           <img class="class-img" src="images/strength.png" alt="Strength Training">
           <div class="class-body">
             <h3>Strength Training</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Strength Training')">Book</button>
           </div>
         </article>
 
-        <!-- Zumba -->
         <article class="class-card">
           <img class="class-img" src="images/zumba.png" alt="Zumba">
           <div class="class-body">
             <h3>Zumba</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Zumba')">Book</button>
           </div>
         </article>
 
-        <!-- Functional -->
         <article class="class-card">
           <img class="class-img" src="images/functional.png" alt="Functional Training">
           <div class="class-body">
             <h3>Functional Training</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Functional Training')">Book</button>
           </div>
         </article>
 
-        <!-- Boxing -->
         <article class="class-card">
           <img class="class-img" src="images/boxing.png" alt="Boxing Fitness">
           <div class="class-body">
             <h3>Boxing Fitness</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Boxing Fitness')">Book</button>
           </div>
         </article>
 
-        <!-- Mobility -->
         <article class="class-card">
           <img class="class-img" src="images/mobility.png" alt="Mobility & Stretch">
           <div class="class-body">
             <h3>Mobility & Stretch</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Mobility & Stretch')">Book</button>
           </div>
         </article>
 
-        <!-- Meditation -->
         <article class="class-card">
           <img class="class-img" src="images/meditation.png" alt="Meditation">
           <div class="class-body">
             <h3>Meditation</h3>
             <p class="spots-text">Spots left: <span class="spots">20</span></p>
-            <button class="btn btn-dark book-btn">Book</button>
+            <button class="btn btn-dark book-btn" onclick="goToBooking('Meditation')">Book</button>
           </div>
         </article>
 
@@ -139,7 +130,6 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <p>© <span id="year"></span> Uplift Gym</p>
@@ -149,5 +139,33 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
+
+  <script src="script.js"></script>
+  
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      renderAuthMenu();
+    });
+  </script>
+
+<script>
+function goToBooking(className) {
+  localStorage.setItem("selectedClass", className);
+
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  if (!isLoggedIn) {
+    window.location.href = "login.html?redirect=booking.html";
+    return;
+  }
+
+  window.location.href = "booking.html";
+}
+</script>
 </body>
 </html>

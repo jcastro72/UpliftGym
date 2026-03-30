@@ -1,21 +1,22 @@
-const buttons = document.querySelectorAll(".book-btn");
+document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".book-btn");
 
-buttons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const card = button.closest(".class-card");
-    const spotsSpan = card.querySelector(".spots");
-    let spots = parseInt(spotsSpan.textContent, 10);
+  buttons.forEach((button) => {
+    button.addEventListener("click", function () {
+      const card = button.closest(".class-card");
+      const className = card.querySelector("h3").textContent.trim();
 
-    if (spots > 0) {
-      spots--;
-      spotsSpan.textContent = spots;
+      localStorage.setItem("selectedClass", className);
 
-      if (spots === 0) {
-        button.textContent = "Full";
-        button.disabled = true;
-        button.style.opacity = "0.6";
-        button.style.cursor = "not-allowed";
+      const encodedClass = encodeURIComponent(`Group Class - ${className}`);
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+      if (!isLoggedIn) {
+        window.location.href = `login.html?redirect=booking.html%3Fclass%3D${encodedClass}`;
+        return;
       }
-    }
+
+      window.location.href = `booking.html?class=${encodedClass}`;
+    });
   });
 });
