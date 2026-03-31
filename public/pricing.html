@@ -167,5 +167,33 @@ function selectPlan(planKey) {
       renderAuthMenu();
     });
   </script>
+
+  <script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+
+  if (user && user.membershipActive && user.selectedPlan) {
+    const currentPlanKey = user.selectedPlan.key;
+
+    const buttons = document.querySelectorAll(".price-btn");
+
+    buttons.forEach((btn) => {
+      const href = btn.getAttribute("href");
+
+      if (!href) return;
+
+      if (href.includes(`plan=${currentPlanKey}`)) {
+        btn.textContent = "Your Current Plan";
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-outline-dark");
+        btn.style.pointerEvents = "none";
+      } else {
+        btn.textContent = "Change Plan";
+        btn.href = "/public/payment.html";
+      }
+    });
+  }
+</script>
 </body>
 </html>
