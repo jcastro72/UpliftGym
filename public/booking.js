@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const plan = JSON.parse(localStorage.getItem("selectedPlan"));
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+  const plan = JSON.parse(localStorage.getItem("selectedPlan"));
+  const selectedClassName = localStorage.getItem("selectedClassName");
 
   if (!plan) {
     alert("You must select a plan first.");
@@ -16,10 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  if (!selectedClassName) {
+    alert("No class selected.");
+    window.location.href = "/classes.html";
+    return;
+  }
+
   const state = {
-    sessionType: "",
-    date: "",
-    time: "",
+    selectedSession: null,
     name: "",
     email: "",
     phone: "",
@@ -28,118 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
     total: 0
   };
 
-  class BookingManager {
-    static STORAGE_KEY = "upliftgym_bookings";
-    static GROUP_CAPACITY = 20;
-
-    static getBookings() {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || "[]");
-    }
-
-    static addBooking(booking) {
-      const bookings = this.getBookings();
-      bookings.push(booking);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(bookings));
-    }
-
-    static getGroupTimes(sessionType) {
-    const classSchedules = {
-      "Group Class - Yoga": ["08:00 AM", "06:00 PM"],
-      "Group Class - HIIT": ["10:00 AM", "05:00 PM"],
-      "Group Class - Pilates": ["09:00 AM", "07:00 PM"],
-      "Group Class - Spin": ["06:30 AM", "06:30 PM"],
-      "Group Class - Strength Training": ["12:00 PM", "07:30 PM"],
-      "Group Class - Zumba": ["05:30 PM"],
-      "Group Class - Functional Training": ["07:00 AM", "05:00 PM"],
-      "Group Class - Boxing Fitness": ["06:00 PM"],
-      "Group Class - Mobility & Stretch": ["08:30 AM"],
-      "Group Class - Meditation": ["07:30 PM"]
-    };
-
-    return classSchedules[sessionType] || [];
-    }
-
-    static getAvailableSpots(date, time, type) {
-      const bookings = this.getBookings();
-
-      const count = bookings.filter((b) =>
-        b.date === date &&
-        b.time === time &&
-        b.sessionType === type
-      ).length;
-
-      return Math.max(0, this.GROUP_CAPACITY - count);
-    }
-
-    static getUserBookings() {
-      const bookings = this.getBookings();
-      const userEmail = localStorage.getItem("userEmail");
-
-      return bookings.filter((b) => b.email === userEmail);
-    }
-
-   static getWeekKey(dateString) {
-      const date = new Date(dateString + "T00:00:00");
-      const day = date.getDay();
-      const weekStart = new Date(date);
-      weekStart.setDate(date.getDate() - day);
-
-      const year = weekStart.getFullYear();
-      const month = String(weekStart.getMonth() + 1).padStart(2, "0");
-      const dayNum = String(weekStart.getDate()).padStart(2, "0");
-
-      return `${year}-${month}-${dayNum}`;
-    }
-
-    static getUserWeeklyBookings(date) {
-      const userBookings = this.getUserBookings();
-      const selectedWeekKey = this.getWeekKey(date);
-
-      return userBookings.filter((booking) => {
-        return this.getWeekKey(booking.date) === selectedWeekKey;
-      }).length;
-    }
-  }
-
-  function canBookMore(date) {
-    const userBookings = BookingManager.getUserBookings();
-
-    if (plan.key === "single-class") {
-      return userBookings.length < 1;
-    }
-
-    const weekly = BookingManager.getUserWeeklyBookings(date);
-
-    if (plan.key === "starter") return weekly < 2;
-    if (plan.key === "plus") return weekly < 4;
-    if (plan.key === "unlimited") return true;
-
-    return false;
-  }
-
-  function getRemainingBookings(date) {
-    const userBookings = BookingManager.getUserBookings();
-
-    if (plan.key === "single-class") {
-      return 1 - userBookings.length;
-    }
-
-    const used = BookingManager.getUserWeeklyBookings(date);
-
-    if (plan.key === "starter") return 2 - used;
-    if (plan.key === "plus") return 4 - used;
-    if (plan.key === "unlimited") return "Unlimited";
-
-    return 0;
-  }
-
   const stepForm = document.getElementById("step-form");
   const stepReview = document.getElementById("step-review");
   const stepPayment = document.getElementById("step-payment");
   const stepConfirmation = document.getElementById("step-confirmation");
 
-  const sessionType = document.getElementById("sessionType");
-  const dateInput = document.getElementById("date");
   const nameInput = document.getElementById("name");
   const emailInput = document.getElementById("email");
   const phoneInput = document.getElementById("phone");
@@ -165,6 +63,18 @@ document.addEventListener("DOMContentLoaded", function () {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function formatDate(dateString) {
+    const date = new Date(dateString + "T00:00:00");
+    return date.toLocaleDateString();
+  }
+
+  function formatTime(timeString) {
+    const [hours, minutes] = timeString.split(":");
+    const date = new Date();
+    date.setHours(Number(hours), Number(minutes), 0);
+    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
   function calculatePricing() {
     if (plan.key === "single-class") {
       const base = 25;
@@ -182,87 +92,22 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function validateForm() {
-    const remaining = state.date ? getRemainingBookings(state.date) : null;
-
     const valid =
-      state.sessionType &&
-      state.date &&
-      state.time &&
+      state.selectedSession &&
       nameInput.value.trim() &&
       emailInput.value.trim() &&
       phoneInput.value.trim();
 
-    if (remaining !== null && remaining !== "Unlimited" && remaining <= 0) {
-      goReviewBtn.disabled = true;
-      return;
-    }
-
     goReviewBtn.disabled = !valid;
   }
 
-  function updateRemainingText() {
-    const el = document.getElementById("remainingText");
-
-    if (!state.date) {
-      el.textContent = "";
-      return;
-    }
-
-    const remaining = getRemainingBookings(state.date);
-
-    if (remaining === "Unlimited") {
-      el.textContent = "You have unlimited bookings.";
-      return;
-    }
-
-    if (remaining <= 0) {
-      el.textContent = "No bookings left for this plan.";
-      return;
-    }
-
-    el.textContent = `You have ${remaining} class(es) left.`;
-  }
-
-  function renderTimeSlots() {
-    const container = document.getElementById("timeSlots");
-    container.innerHTML = "";
-
-    if (!state.sessionType || !state.date) {
-      return;
-    }
-
-    const slots = BookingManager.getGroupTimes(state.sessionType);
-
-    slots.forEach((slot) => {
-      const spots = BookingManager.getAvailableSpots(state.date, slot, state.sessionType);
-      const button = document.createElement("button");
-
-      button.type = "button";
-      button.className = "time-slot-btn";
-      button.textContent = `${slot} (${spots} spots left)`;
-
-      if (spots === 0) {
-        button.disabled = true;
-      }
-
-      if (state.time === slot) {
-        button.classList.add("selected");
-      }
-
-      button.addEventListener("click", function () {
-        state.time = slot;
-        renderTimeSlots();
-        validateForm();
-      });
-
-      container.appendChild(button);
-    });
-  }
-
   function fillReviewStep() {
-    document.getElementById("revSession").textContent = state.sessionType;
-    document.getElementById("revDate").textContent = state.date;
-    document.getElementById("revTime").textContent = state.time;
+    document.getElementById("revSession").textContent = state.selectedSession.class_name;
+    document.getElementById("revDate").textContent = formatDate(state.selectedSession.class_date);
+    document.getElementById("revTime").textContent =
+      `${formatTime(state.selectedSession.start_time)} - ${formatTime(state.selectedSession.end_time)}`;
+    document.getElementById("revInstructor").textContent = state.selectedSession.instructor_name || "TBD";
+
     document.getElementById("revName").textContent = state.name;
     document.getElementById("revEmail").textContent = state.email;
     document.getElementById("revPhone").textContent = state.phone;
@@ -279,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function fillPaymentStep() {
-    document.getElementById("paySession").textContent = state.sessionType;
+    document.getElementById("paySession").textContent = state.selectedSession.class_name;
 
     if (plan.key === "single-class") {
       document.getElementById("payPrice").textContent = `$${state.price.toFixed(2)}`;
@@ -294,110 +139,156 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-
   function fillConfirmationStep() {
-  document.getElementById("confSession").textContent = state.sessionType;
-  document.getElementById("confDate").textContent = state.date;
-  document.getElementById("confTime").textContent = state.time;
-  document.getElementById("confName").textContent = state.name;
-  document.getElementById("confEmail").textContent = state.email;
-  document.getElementById("confPhone").textContent = state.phone;
+    document.getElementById("confSession").textContent = state.selectedSession.class_name;
+    document.getElementById("confDate").textContent = formatDate(state.selectedSession.class_date);
+    document.getElementById("confTime").textContent =
+      `${formatTime(state.selectedSession.start_time)} - ${formatTime(state.selectedSession.end_time)}`;
+    document.getElementById("confInstructor").textContent = state.selectedSession.instructor_name || "TBD";
 
-  if (plan.key === "single-class") {
-    document.getElementById("confPrice").textContent = `$${state.price.toFixed(2)}`;
-    document.getElementById("confTax").textContent = `$${state.tax.toFixed(2)}`;
-    document.getElementById("confTotal").textContent = `$${state.total.toFixed(2)}`;
-  } else {
-    document.getElementById("confPrice").textContent = "Included in your membership";
-    document.getElementById("confTax").textContent = "Included";
-    document.getElementById("confTotal").textContent = "No additional charge";
+    document.getElementById("confName").textContent = state.name;
+    document.getElementById("confEmail").textContent = state.email;
+    document.getElementById("confPhone").textContent = state.phone;
+
+    if (plan.key === "single-class") {
+      document.getElementById("confPrice").textContent = `$${state.price.toFixed(2)}`;
+      document.getElementById("confTax").textContent = `$${state.tax.toFixed(2)}`;
+      document.getElementById("confTotal").textContent = `$${state.total.toFixed(2)}`;
+    } else {
+      document.getElementById("confPrice").textContent = "Included in your membership";
+      document.getElementById("confTax").textContent = "Included";
+      document.getElementById("confTotal").textContent = "No additional charge";
+    }
   }
-}
 
-  function finalizeBooking() {
-    if (!canBookMore(state.date)) {
-      alert("You reached your booking limit.");
+  async function loadSessions() {
+    const selectedClassDisplay = document.getElementById("selectedClassDisplay");
+    const sessionsList = document.getElementById("sessionsList");
+    const remainingText = document.getElementById("remainingText");
+
+    selectedClassDisplay.textContent = selectedClassName;
+    document.getElementById("bookingTitle").textContent = `Book ${selectedClassName}`;
+
+    try {
+      const response = await fetch(`/class/by-name/${encodeURIComponent(selectedClassName)}`);
+      const data = await response.json();
+
+      if (!data.ok || !data.classes || data.classes.length === 0) {
+        sessionsList.innerHTML = "<p>No sessions available for this class right now.</p>";
+        remainingText.textContent = "";
+        return;
+      }
+
+      sessionsList.innerHTML = "";
+
+      for (const cls of data.classes) {
+        const spotsRes = await fetch(`/bookings/spots/${cls.class_ID}`);
+        const spotsData = await spotsRes.json();
+        const booked = spotsData.ok ? spotsData.booked : 0;
+        const remainingSpots = Math.max(cls.max_capacity - booked, 0);
+
+        const sessionCard = document.createElement("button");
+        sessionCard.type = "button";
+        sessionCard.className = "time-slot-btn";
+        sessionCard.style.textAlign = "left";
+        sessionCard.style.padding = "14px";
+        sessionCard.style.display = "block";
+        sessionCard.style.width = "100%";
+        sessionCard.disabled = remainingSpots === 0;
+
+        sessionCard.innerHTML = `
+          <strong>${formatDate(cls.class_date)}</strong><br>
+          ${formatTime(cls.start_time)} - ${formatTime(cls.end_time)}<br>
+          Instructor: ${cls.instructor_name || "TBD"}<br>
+          Spots left: ${remainingSpots}
+        `;
+
+        sessionCard.addEventListener("click", () => {
+          state.selectedSession = cls;
+
+          document.querySelectorAll("#sessionsList .time-slot-btn").forEach((btn) => {
+            btn.classList.remove("selected");
+          });
+
+          sessionCard.classList.add("selected");
+          remainingText.textContent = `Spots left for selected session: ${remainingSpots}`;
+          validateForm();
+        });
+
+        sessionsList.appendChild(sessionCard);
+      }
+    } catch (err) {
+      console.error(err);
+      sessionsList.innerHTML = "<p>Failed to load sessions. Please try again later.</p>";
+      remainingText.textContent = "";
+    }
+  }
+
+  async function finalizeBooking() {
+    const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+
+    if (!state.selectedSession || !state.selectedSession.class_ID) {
+      alert("Please select a session.");
       return;
     }
 
-    BookingManager.addBooking({
-      sessionType: state.sessionType,
-      date: state.date,
-      time: state.time,
-      name: state.name,
-      email: localStorage.getItem("userEmail"),
-      phone: state.phone
-    });
+    if (!user || !user.user_ID) {
+      alert("You must be logged in to book a class.");
+      window.location.href = "/login.html?redirect=booking.html";
+      return;
+    }
 
-    fillConfirmationStep();
-    showStep("confirmation");
-    updateRemainingText();
+    try {
+      const response = await fetch("/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_ID: user.user_ID,
+          class_ID: state.selectedSession.class_ID
+        })
+      });
+
+      const data = await response.json();
+
+      if (!data.ok) {
+        alert(data.message || "Failed to book session.");
+        return;
+      }
+
+      fillConfirmationStep();
+      showStep("confirmation");
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again later.");
+    }
   }
 
   function loadInitialData() {
-    const params = new URLSearchParams(window.location.search);
-    const preselectedClass = params.get("class");
-    const savedClass = localStorage.getItem("selectedClass");
-
-    if (preselectedClass) {
-      sessionType.value = preselectedClass;
-      state.sessionType = preselectedClass;
-    } else if (savedClass) {
-      const fullClassName = `Group Class - ${savedClass}`;
-      sessionType.value = fullClassName;
-      state.sessionType = fullClassName;
-    }
-
     if (loggedInUser) {
       nameInput.value = `${loggedInUser.firstName} ${loggedInUser.lastName}`;
       emailInput.value = loggedInUser.email;
       state.name = nameInput.value.trim();
       state.email = emailInput.value.trim();
     }
-
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.min = today;
   }
-
-  sessionType.addEventListener("change", function (event) {
-    state.sessionType = event.target.value;
-    state.time = "";
-    renderTimeSlots();
-    validateForm();
-  });
-
-  dateInput.addEventListener("change", function (event) {
-    state.date = event.target.value;
-    state.time = "";
-    renderTimeSlots();
-    updateRemainingText();
-    validateForm();
-  });
 
   nameInput.addEventListener("input", validateForm);
   emailInput.addEventListener("input", validateForm);
   phoneInput.addEventListener("input", validateForm);
 
-  goReviewBtn.addEventListener("click", function () {
+  goReviewBtn.addEventListener("click", () => {
     state.name = nameInput.value.trim();
     state.email = emailInput.value.trim();
     state.phone = phoneInput.value.trim();
 
     calculatePricing();
     fillReviewStep();
-
-    if (plan.key === "single-class") {
-      showStep("review");
-    } else {
-      showStep("review");
-    }
+    showStep("review");
   });
 
-  editBookingReviewBtn.addEventListener("click", function () {
-    showStep("form");
-  });
+  editBookingReviewBtn.addEventListener("click", () => showStep("form"));
 
-  goPaymentBtn.addEventListener("click", function () {
+  goPaymentBtn.addEventListener("click", () => {
     if (plan.key === "single-class") {
       fillPaymentStep();
       showStep("payment");
@@ -406,9 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  backToReviewBtn.addEventListener("click", function () {
-    showStep("review");
-  });
+  backToReviewBtn.addEventListener("click", () => showStep("review"));
 
   document.getElementById("cardNumber").addEventListener("input", function (e) {
     let value = e.target.value.replace(/\D/g, "").substring(0, 16);
@@ -469,13 +358,12 @@ document.addEventListener("DOMContentLoaded", function () {
     finalizeBooking();
   });
 
-  bookAnotherBtn.addEventListener("click", function () {
+  bookAnotherBtn.addEventListener("click", () => {
     window.location.href = "/classes.html";
   });
 
   loadInitialData();
-  renderTimeSlots();
-  updateRemainingText();
+  loadSessions();
   validateForm();
   showStep("form");
 });

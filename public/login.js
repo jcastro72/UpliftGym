@@ -1,8 +1,20 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// If already logged in, redirect to homepage
-if (localStorage.getItem("isLoggedIn") === "true") {
-  window.location.href = "/index.html";
+async function alreadyLoggedIn() {
+  const user = getStoredUser();
+
+  if (!user || !user.user_ID) {
+    return false;
+  }
+
+  try {
+    const res = await fetch(`/users/me?user_ID=${user.user_ID}`);
+    const data = await res.json();
+    return data.ok && data.user;
+  } catch (err) {
+    console.error("Already logged in check failed:", err);
+    return false;
+  }
 }
 
 function clearLoginErrors() {
@@ -32,7 +44,14 @@ function goBackPage() {
   window.location.href = "/index.html";
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+  const isAlreadyLoggedIn = await alreadyLoggedIn();
+
+  if (isAlreadyLoggedIn) {
+    window.location.href = "/classes.html";
+    return;
+  }
+
   const loginForm = document.getElementById("loginForm");
   const loginMessage = document.getElementById("loginMessage");
   const signupLink = document.getElementById("signupLink");
@@ -75,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      // Send login request to backend
       const response = await fetch("/users/login", {
         method: "POST",
         headers: {
@@ -86,28 +104,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        // Backend returned an error (user not found or wrong password)
+      if (!response.ok || !data.ok) {
         emailInput.classList.add("input-error");
         passwordInput.classList.add("input-error");
-        loginMessage.textContent = data.error || "Login failed.";
+        loginMessage.textContent = data.error || data.message || "Login failed.";
         loginMessage.style.color = "red";
         return;
       }
 
       const user = data.user;
 
-      // Store user info in localStorage
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", user.email);
       localStorage.setItem("loggedInUser", JSON.stringify(user));
+      localStorage.setItem("userEmail", user.email);
 
       if (user.selectedPlan) {
         localStorage.setItem("selectedPlan", JSON.stringify(user.selectedPlan));
+      } else {
+        localStorage.removeItem("selectedPlan");
       }
 
       if (user.membershipActive) {
         localStorage.setItem("membershipActive", "true");
+      } else {
+        localStorage.removeItem("membershipActive");
       }
 
       loginMessage.textContent = "Login successful!";
@@ -117,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (redirect) {
           window.location.href = `/${redirect.replace(/^\/+/, "")}`;
         } else {
-          window.location.href = "/confirm.html";
+          window.location.href = "/classes.html";
         }
       }, 700);
 
