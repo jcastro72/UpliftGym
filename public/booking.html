@@ -10,7 +10,9 @@
 <body>
 
   <script>
-    requireAuth();
+    document.addEventListener("DOMContentLoaded", async () => {
+      await requireAuth();
+    });
   </script>
 
   <header class="header">
@@ -34,40 +36,26 @@
 
   <div id="booking-app">
 
+    <!-- STEP 1: SELECT SESSION -->
     <section id="step-form" class="booking-container">
       <div class="booking-card">
 
         <button class="close-btn" type="button" onclick="window.location.href='classes.html'">×</button>
 
-        <h1>Book Your Session</h1>
-        <p class="booking-subtitle">Fill out the form below to reserve your spot.</p>
+        <h1 id="bookingTitle">Book Your Session</h1>
+        <p class="booking-subtitle">Choose one of the available sessions below.</p>
 
         <div class="form-section">
-          <label for="sessionType">Choose Fitness Session</label>
-          <select id="sessionType">
-            <option value="">Select a session...</option>
-            <option>Group Class - Yoga</option>
-            <option>Group Class - HIIT</option>
-            <option>Group Class - Pilates</option>
-            <option>Group Class - Spin</option>
-            <option>Group Class - Strength Training</option>
-            <option>Group Class - Zumba</option>
-            <option>Group Class - Functional Training</option>
-            <option>Group Class - Boxing Fitness</option>
-            <option>Group Class - Mobility & Stretch</option>
-            <option>Group Class - Meditation</option>
-          </select>
+          <label>Selected Class</label>
+          <div id="selectedClassDisplay" class="card" style="margin-top:8px;">
+            Loading class...
+          </div>
         </div>
 
-        <div class="booking-grid">
-          <div>
-            <label for="date">Select Date</label>
-            <input type="date" id="date" />
-          </div>
-
-          <div>
-            <label>Select Time</label>
-            <div id="timeSlots" class="time-slot-list"></div>
+        <div class="form-section">
+          <label>Available Sessions</label>
+          <div id="sessionsList" class="time-slot-list" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+            <p>Loading sessions...</p>
           </div>
         </div>
 
@@ -92,6 +80,7 @@
       </div>
     </section>
 
+    <!-- STEP 2: REVIEW -->
     <section id="step-review" class="booking-container" style="display:none;">
       <div class="booking-card">
         <h1>Review Your Booking</h1>
@@ -102,6 +91,7 @@
           <p><strong>Session:</strong> <span id="revSession"></span></p>
           <p><strong>Date:</strong> <span id="revDate"></span></p>
           <p><strong>Time:</strong> <span id="revTime"></span></p>
+          <p><strong>Instructor:</strong> <span id="revInstructor"></span></p>
         </div>
 
         <div class="review-section">
@@ -113,9 +103,9 @@
 
         <div class="review-section">
           <h3 class="review-heading">Pricing</h3>
-            <p><strong>Session Price:</strong> <span id="revPrice"></span></p>
-            <p><strong>Tax:</strong> <span id="revTax"></span></p>
-            <p><strong>Total Amount:</strong> <span id="revTotal"></span></p>
+          <p><strong>Session Price:</strong> <span id="revPrice"></span></p>
+          <p><strong>Tax:</strong> <span id="revTax"></span></p>
+          <p><strong>Total Amount:</strong> <span id="revTotal"></span></p>
         </div>
 
         <div class="review-actions">
@@ -125,6 +115,7 @@
       </div>
     </section>
 
+    <!-- STEP 3: PAYMENT -->
     <section id="step-payment" class="booking-container" style="display:none;">
       <div class="booking-card">
         <h1 class="payment-title">Secure Payment</h1>
@@ -168,6 +159,7 @@
       </div>
     </section>
 
+    <!-- STEP 4: CONFIRMATION -->
     <section id="step-confirmation" class="booking-container" style="display:none;">
       <div class="booking-card">
         <h1 class="confirm-title">Booking Confirmed!</h1>
@@ -178,6 +170,7 @@
           <p><strong>Session:</strong> <span id="confSession"></span></p>
           <p><strong>Date:</strong> <span id="confDate"></span></p>
           <p><strong>Time:</strong> <span id="confTime"></span></p>
+          <p><strong>Instructor:</strong> <span id="confInstructor"></span></p>
         </div>
 
         <div class="confirm-section">
