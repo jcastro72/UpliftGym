@@ -16,6 +16,8 @@ CREATE TABLE users (
     state VARCHAR(50),
     zip VARCHAR(10),
     phone VARCHAR(20),
+    membershipActive TINYINT(1) NOT NULL DEFAULT 0,
+    selectedPlan VARCHAR(50) DEFAULT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

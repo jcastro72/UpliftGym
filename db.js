@@ -16,17 +16,18 @@ const dbConfig = {
   database: process.env.DB_NAME || 'uplift_gym', // database name
 };
 
-// Create a connection to the database
-const db = mysql.createConnection(dbConfig);
+// Create a connection pool (survives idle timeouts and reconnects automatically)
+const db = mysql.createPool(dbConfig);
 
-// Connect to the database
-db.connect((err) => {
+// Verify connectivity on startup
+db.getConnection((err, connection) => {
   if (err) {
     console.error('Database connection failed:', err);
   } else {
     console.log(`Connected to MySQL (${dbConfig.host}:${dbConfig.port}/${dbConfig.database})`);
+    connection.release();
   }
 });
 
-// Export the connection so other files (like server.js or controllers) can use it
+// Export the pool so other files (like server.js or controllers) can use it
 module.exports = db;
