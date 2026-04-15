@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Account - Uplift Gym</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="user.css" />
+</head>
+
+<body>
+  <header class="header user-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">
+          <img src="images/uplift.png" alt="Uplift Gym logo" class="brand-logo" />
+        </span>
+        <span class="brand-name">Uplift Gym</span>
+      </a>
+
+      <nav class="nav user-nav">
+        <a href="#security" class="active">Security</a>
+        <a href="#membership">Membership</a>
+        <a href="#classes">Classes</a>
+
+        <button id="userLogoutBtn" class="btn btn-dark user-logout" type="button">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section user-main">
+    <div class="container">
+      <div id="userMessage" class="user-message" hidden></div>
+    </div>
+
+    <!-- SECURITY -->
+    <section id="security" class="user-block">
+      <div class="container">
+        <div class="section-head user-section-head">
+          <h2>Security</h2>
+          <p>Manage your login and password settings.</p>
+        </div>
+
+        <div class="card user-card">
+          <h3 class="user-card-title">Account Information</h3>
+
+          <div class="user-info-row">
+            <div>
+              <p class="user-info-label">Username</p>
+              <p id="userNameDisplay" class="user-info-value">Loading...</p>
+            </div>
+          </div>
+
+          <hr class="user-divider" />
+
+          <h3 class="user-card-title">Change Password</h3>
+
+          <form id="changePasswordForm" class="user-form">
+            <div class="form-section">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" required />
+            </div>
+
+            <div class="form-section">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" required />
+            </div>
+
+            <div class="form-section">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input type="password" id="confirmPassword" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary user-btn">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMBERSHIP -->
+    <section id="membership" class="user-block">
+      <div class="container">
+        <div class="section-head user-section-head">
+          <h2>Membership</h2>
+          <p>Your plan details and remaining credits.</p>
+        </div>
+
+        <div class="card user-card">
+          <h3 class="user-card-title">Membership Details</h3>
+
+          <div class="user-info-row">
+            <div>
+              <p class="user-info-label">Plan</p>
+              <p id="membershipPlan" class="user-info-value">Loading...</p>
+            </div>
+
+            <div>
+              <p class="user-info-label">Expires</p>
+              <p id="membershipExpires" class="user-info-value">Loading...</p>
+            </div>
+
+            <div>
+              <p class="user-info-label">Credits Left</p>
+              <p id="membershipCredits" class="user-info-value">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLASSES -->
+    <section id="classes" class="user-block">
+      <div class="container">
+        <div class="section-head user-section-head">
+          <h2>Your Classes</h2>
+          <p>Classes you have already booked.</p>
+        </div>
+
+        <div class="card user-card">
+          <div class="user-table-head">
+            <h3>Booked Classes</h3>
+          </div>
+
+          <div class="user-table-wrap">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Class</th>
+                  <th>Instructor</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="userClassesTable">
+                <tr>
+                  <td colspan="4" class="user-loading-cell">Loading classes...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer user-footer">
+    <div class="container">
+      <p>© <span id="year"></span> Uplift Gym</p>
+    </div>
+  </footer>
+
+  <script src="user.js"></script>
+</body>
+</html>
