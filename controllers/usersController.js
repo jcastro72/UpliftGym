@@ -141,11 +141,7 @@ function getCurrentUser(req, res) {
     return res.json({ ok: false, user: null });
   }
 
-  const sql = `
-    SELECT user_ID, first_name, last_name, email, street, city, state, zip, membershipActive, selectedPlan, isAdmin
-    FROM users
-    WHERE user_ID = ?
-  `;
+  const sql = 'SELECT * FROM users WHERE user_ID = ?';
 
   db.query(sql, [user_ID], (err, results) => {
     if (err) {
@@ -165,6 +161,8 @@ function getCurrentUser(req, res) {
         firstName: dbUser.first_name,
         lastName: dbUser.last_name,
         email: dbUser.email,
+        phone: dbUser.phone || null,
+        dob: dbUser.dob ? dbUser.dob.toISOString().split("T")[0] : null,
         street: dbUser.street,
         city: dbUser.city,
         state: dbUser.state,
