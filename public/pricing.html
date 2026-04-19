@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
@@ -28,7 +27,6 @@
     </div>
   </header>
 
-  <!-- PRICING -->
   <section class="pricing" id="pricing">
     <div class="container">
       <div class="pricing-head">
@@ -39,10 +37,9 @@
 
       <div class="pricing-grid">
 
-        <!-- Single Class -->
-        <div class="price-card">
+        <div class="price-card" data-plan-key="single-class">
           <h3>Single Class</h3>
-          <div class="price"><span class="currency">$</span>25</div>
+          <div class="price"><span class="currency">$</span><span id="singleClassPrice">25</span></div>
           <p class="per">per class</p>
 
           <ul class="price-list">
@@ -52,13 +49,12 @@
             <li>One-time payment</li>
           </ul>
 
-          <button class="btn btn-dark price-btn" onclick="selectPlan('single-class')">Select</button>
+          <button class="btn btn-dark price-btn" data-plan-key="single-class">Select</button>
         </div>
 
-        <!-- Starter -->
-        <div class="price-card">
+        <div class="price-card" data-plan-key="starter">
           <h3>Starter</h3>
-          <div class="price"><span class="currency">$</span>79</div>
+          <div class="price"><span class="currency">$</span><span id="starterPrice">79</span></div>
           <p class="per">per month</p>
 
           <ul class="price-list">
@@ -68,14 +64,13 @@
             <li>Best for beginners</li>
           </ul>
 
-          <button class="btn btn-dark price-btn" onclick="selectPlan('starter')">Select</button>
+          <button class="btn btn-dark price-btn" data-plan-key="starter">Select</button>
         </div>
 
-        <!-- Plus -->
-        <div class="price-card popular">
+        <div class="price-card popular" data-plan-key="plus">
           <div class="badge">Most Popular</div>
           <h3>Plus</h3>
-          <div class="price"><span class="currency">$</span>119</div>
+          <div class="price"><span class="currency">$</span><span id="plusPrice">119</span></div>
           <p class="per">per month</p>
 
           <ul class="price-list">
@@ -85,13 +80,12 @@
             <li>More weekly flexibility</li>
           </ul>
 
-          <button class="btn btn-primary price-btn" onclick="selectPlan('plus')">Select</button>
+          <button class="btn btn-primary price-btn" data-plan-key="plus">Select</button>
         </div>
 
-        <!-- Unlimited -->
-        <div class="price-card">
+        <div class="price-card" data-plan-key="unlimited">
           <h3>Unlimited</h3>
-          <div class="price"><span class="currency">$</span>159</div>
+          <div class="price"><span class="currency">$</span><span id="unlimitedPrice">159</span></div>
           <p class="per">per month</p>
 
           <ul class="price-list">
@@ -101,99 +95,155 @@
             <li>Ideal for frequent training</li>
           </ul>
 
-          <button class="btn btn-dark price-btn" onclick="selectPlan('unlimited')">Select</button>
+          <button class="btn btn-dark price-btn" data-plan-key="unlimited">Select</button>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <p>© <span id="year"></span> Uplift Gym</p>
     </div>
   </footer>
 
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
-
-const planDetails = {
-  starter: {
-    key: "starter",
-    name: "Starter Plan",
-    price: "$79/month",
-    description: "2 classes per week"
-  },
-  plus: {
-    key: "plus",
-    name: "Plus Plan",
-    price: "$119/month",
-    description: "4 classes per week"
-  },
-  unlimited: {
-    key: "unlimited",
-    name: "Unlimited Plan",
-    price: "$159/month",
-    description: "Unlimited classes"
-  },
-  "single-class": {
-    key: "single-class",
-    name: "Single Class",
-    price: "$25",
-    description: "One class booking"
-  }
-};
-
-function selectPlan(planKey) {
-  const plan = planDetails[planKey];
-
-  localStorage.setItem("selectedPlan", JSON.stringify(plan));
-  localStorage.removeItem("membershipActive");
-
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-  if (!isLoggedIn) {
-    window.location.href = `login.html?redirect=payment.html`;
-    return;
-  }
-
-  window.location.href = "payment.html";
-}
-</script>
-<script src="auth.js"></script>
+  <script src="auth.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      renderAuthMenu();
+    document.addEventListener("DOMContentLoaded", async function () {
+      document.getElementById("year").textContent = new Date().getFullYear();
+      await renderAuthMenu();
+      await loadPricingFromDatabase();
+      setupPricingButtons();
+      markCurrentPlan();
     });
-  </script>
 
-  <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
-
-  if (user && user.membershipActive && user.selectedPlan) {
-    const currentPlanKey = user.selectedPlan.key;
-
-    const buttons = document.querySelectorAll(".price-btn");
-
-    buttons.forEach((btn) => {
-      const href = btn.getAttribute("href");
-
-      if (!href) return;
-
-      if (href.includes(`plan=${currentPlanKey}`)) {
-        btn.textContent = "Your Current Plan";
-        btn.classList.remove("btn-primary");
-        btn.classList.add("btn-outline-dark");
-        btn.style.pointerEvents = "none";
-      } else {
-        btn.textContent = "Change Plan";
-        btn.href = "/public/payment.html";
+    const planMeta = {
+      starter: {
+        key: "starter",
+        name: "Starter Plan",
+        description: "2 classes per week",
+        suffix: "/month"
+      },
+      plus: {
+        key: "plus",
+        name: "Plus Plan",
+        description: "4 classes per week",
+        suffix: "/month"
+      },
+      unlimited: {
+        key: "unlimited",
+        name: "Unlimited Plan",
+        description: "Unlimited classes",
+        suffix: "/month"
+      },
+      "single-class": {
+        key: "single-class",
+        name: "Single Class",
+        description: "One class booking",
+        suffix: ""
       }
-    });
-  }
-</script>
+    };
+
+    const livePricing = {
+      "single-class": 25,
+      starter: 79,
+      plus: 119,
+      unlimited: 159
+    };
+
+    async function loadPricingFromDatabase() {
+      try {
+        const res = await fetch("/pricing");
+        const data = await res.json();
+
+        if (!res.ok || !data.ok || !data.pricing) {
+          throw new Error("Failed to load pricing");
+        }
+
+        data.pricing.forEach((item) => {
+          const numericPrice = Number(item.price);
+          livePricing[item.pricing_key] = numericPrice;
+
+          if (item.pricing_key === "single-class") {
+            document.getElementById("singleClassPrice").textContent = numericPrice.toFixed(2);
+          }
+
+          if (item.pricing_key === "starter") {
+            document.getElementById("starterPrice").textContent = numericPrice.toFixed(2);
+          }
+
+          if (item.pricing_key === "plus") {
+            document.getElementById("plusPrice").textContent = numericPrice.toFixed(2);
+          }
+
+          if (item.pricing_key === "unlimited") {
+            document.getElementById("unlimitedPrice").textContent = numericPrice.toFixed(2);
+          }
+        });
+      } catch (err) {
+        console.error("Failed to load pricing:", err);
+      }
+    }
+
+    function setupPricingButtons() {
+      const buttons = document.querySelectorAll(".price-btn");
+
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const planKey = btn.dataset.planKey;
+          selectPlan(planKey);
+        });
+      });
+    }
+
+    function selectPlan(planKey) {
+      const meta = planMeta[planKey];
+      const priceValue = livePricing[planKey];
+
+      if (!meta) return;
+
+      const plan = {
+        key: meta.key,
+        name: meta.name,
+        price: `$${Number(priceValue).toFixed(2)}${meta.suffix}`,
+        description: meta.description
+      };
+
+      localStorage.setItem("selectedPlan", JSON.stringify(plan));
+
+      const user = getStoredUser ? getStoredUser() : JSON.parse(localStorage.getItem("loggedInUser") || "null");
+
+      if (!user || !user.user_ID) {
+        window.location.href = "login.html?redirect=payment.html";
+        return;
+      }
+
+      window.location.href = "payment.html";
+    }
+
+    function markCurrentPlan() {
+      const user = getStoredUser ? getStoredUser() : JSON.parse(localStorage.getItem("loggedInUser") || "null");
+
+      if (!user || !user.membershipActive || !user.selectedPlan) {
+        return;
+      }
+
+      const buttons = document.querySelectorAll(".price-btn");
+
+      buttons.forEach((btn) => {
+        const planKey = btn.dataset.planKey;
+
+        if (planKey === user.selectedPlan) {
+          btn.textContent = "Your Current Plan";
+          btn.disabled = true;
+          btn.classList.remove("btn-primary", "btn-dark");
+          btn.classList.add("btn-outline-dark");
+        } else {
+          btn.textContent = "Change Plan";
+        }
+      });
+    }
+  </script>
 </body>
 </html>

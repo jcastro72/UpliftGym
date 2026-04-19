@@ -254,6 +254,18 @@ document.addEventListener("DOMContentLoaded", function () {
         alert(data.message || "Failed to book session.");
         return;
       }
+      if (data.membershipConsumed) {
+        localStorage.removeItem("membershipActive");
+
+        const currentUser = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+        if (currentUser) {
+          currentUser.membershipActive = false;
+          currentUser.selectedPlan = null;
+          localStorage.setItem("loggedInUser", JSON.stringify(currentUser));
+        }
+
+        localStorage.removeItem("selectedPlan");
+      }
 
       fillConfirmationStep();
       showStep("confirmation");

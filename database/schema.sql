@@ -18,6 +18,7 @@ CREATE TABLE users (
     phone VARCHAR(20),
     membershipActive TINYINT(1) NOT NULL DEFAULT 0,
     selectedPlan VARCHAR(50) DEFAULT NULL,
+    isAdmin TINYINT(1) NOT NULL DEFAULT 0,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

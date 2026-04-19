@@ -42,9 +42,10 @@ function createUser(req, res) {
       zip,
       phone,
       membershipActive,
-      selectedPlan
+      selectedPlan,
+      isAdmin
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -61,7 +62,8 @@ function createUser(req, res) {
       zip,
       phone,
       false,
-      null
+      null,
+      false
     ],
     (err, result) => {
       if (err) {
@@ -82,7 +84,8 @@ function createUser(req, res) {
           zip,
           phone,
           membershipActive: false,
-          selectedPlan: null
+          selectedPlan: null,
+          isAdmin: false
         }
       });
     }
@@ -123,7 +126,8 @@ function loginUser(req, res) {
         state: user.state,
         zip: user.zip,
         membershipActive: !!user.membershipActive,
-        selectedPlan: user.selectedPlan
+        selectedPlan: user.selectedPlan,
+        isAdmin: !!user.isAdmin
       }
     });
   });
@@ -137,11 +141,7 @@ function getCurrentUser(req, res) {
     return res.json({ ok: false, user: null });
   }
 
-  const sql = `
-    SELECT user_ID, first_name, last_name, email, street, city, state, zip, membershipActive, selectedPlan
-    FROM users
-    WHERE user_ID = ?
-  `;
+  const sql = 'SELECT * FROM users WHERE user_ID = ?';
 
   db.query(sql, [user_ID], (err, results) => {
     if (err) {
@@ -161,14 +161,44 @@ function getCurrentUser(req, res) {
         firstName: dbUser.first_name,
         lastName: dbUser.last_name,
         email: dbUser.email,
+        phone: dbUser.phone || null,
+        dob: dbUser.dob ? dbUser.dob.toISOString().split("T")[0] : null,
         street: dbUser.street,
         city: dbUser.city,
         state: dbUser.state,
         zip: dbUser.zip,
         membershipActive: !!dbUser.membershipActive,
-        selectedPlan: dbUser.selectedPlan
+        selectedPlan: dbUser.selectedPlan,
+        isAdmin: !!dbUser.isAdmin
       }
     });
+  });
+}
+
+// UPDATE user profile
+function updateProfile(req, res) {
+  const { user_ID, first_name, last_name, phone, dob, street, city, state, zip } = req.body;
+
+  if (!user_ID) {
+    return res.status(400).json({ ok: false, message: "user_ID is required" });
+  }
+
+  const sql = `
+    UPDATE users
+    SET first_name = ?, last_name = ?, phone = ?, dob = ?, street = ?, city = ?, state = ?, zip = ?
+    WHERE user_ID = ?
+  `;
+
+  db.query(sql, [first_name, last_name, phone, dob, street, city, state, zip, user_ID], (err, result) => {
+    if (err) {
+      return res.status(500).json({ ok: false, message: err.message });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ ok: false, message: "User not found" });
+    }
+
+    res.json({ ok: true, message: "Profile updated successfully" });
   });
 }
 
@@ -207,5 +237,6 @@ module.exports = {
   createUser,
   loginUser,
   getCurrentUser,
+  updateProfile,
   updateMembership
 };
