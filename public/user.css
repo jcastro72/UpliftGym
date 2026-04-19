@@ -7,6 +7,9 @@
   --user-text-soft: #475569;
   --user-primary: #1b5fae;
   --user-primary-strong: #256fd0;
+
+  /* Orange accent for active tab */
+  --user-accent: #f59e0b;
 }
 
 body {
@@ -22,16 +25,36 @@ body {
 
 .user-nav a {
   color: var(--user-text-soft);
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: 0.25s ease;
 }
 
-.user-nav a.active,
+/* ACTIVE TAB — ORANGE BACKGROUND */
+.user-nav a.active {
+  background: var(--user-accent);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Hover effect */
 .user-nav a:hover {
-  color: var(--user-primary);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--user-accent);
 }
 
 /* Main */
 .user-main {
   padding-top: 20px;
+}
+
+/* SUBPAGE VISIBILITY */
+.user-block {
+  display: none;
+}
+
+.user-block.active {
+  display: block;
 }
 
 .user-block {
@@ -167,15 +190,4 @@ body {
   background: transparent;
   color: var(--user-text-soft);
   border-top: 1px solid var(--user-border);
-}
-
-.user-nav a.active {
-  color: var(--user-primary);
-  font-weight: 700;
-  border-bottom: 2px solid var(--user-primary);
-  padding-bottom: 4px;
-}
-
-.user-nav a {
-  transition: 0.2s ease;
 }
