@@ -1,11 +1,7 @@
 document.addEventListener("DOMContentLoaded", initAdminPage);
 
-const DEFAULT_PRICING = {
-  singleClassPrice: 25,
-  starterPrice: 59,
-  plusPrice: 89,
-  unlimitedPrice: 119
-};
+let editingClassId = null;
+let latestBookings = [];
 
 async function initAdminPage() {
   const year = document.getElementById("year");
@@ -14,7 +10,7 @@ async function initAdminPage() {
   }
 
   bindEvents();
-  loadPricingForm();
+  await loadPricingForm();
 
   try {
     await loadDashboardData();
@@ -31,7 +27,8 @@ function bindEvents() {
   const classesTableBody = document.getElementById("classesTableBody");
 
   if (addClassForm) {
-    addClassForm.addEventListener("submit", handleAddClass);
+    addClassForm.addEventListener("submit", handleAddOrUpdateClass);
+    addClassForm.addEventListener("reset", resetClassFormState);
   }
 
   if (pricingForm) {
@@ -54,9 +51,10 @@ async function loadDashboardData() {
     fetchBookings()
   ]);
 
+  latestBookings = bookings;
   renderOverview(users, classes, bookings);
   renderUsers(users);
-  renderClasses(classes);
+  renderClasses(classes, bookings);
 }
 
 async function fetchUsers() {
@@ -84,7 +82,7 @@ async function fetchClasses() {
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return data.classes || [];
   } catch (error) {
     console.error("fetchClasses error:", error);
     return [];
@@ -121,7 +119,7 @@ function renderOverview(users, classes, bookings) {
   setText("overviewBookings", totalBookings);
 }
 
-function renderClasses(classes) {
+function renderClasses(classes, bookings = []) {
   const tbody = document.getElementById("classesTableBody");
   if (!tbody) return;
 
@@ -134,7 +132,7 @@ function renderClasses(classes) {
     return;
   }
 
-  tbody.innerHTML = classes.map(createClassRow).join("");
+  tbody.innerHTML = classes.map((classItem) => createClassRow(classItem, bookings)).join("");
 }
 
 function renderUsers(users) {
@@ -153,7 +151,7 @@ function renderUsers(users) {
   tbody.innerHTML = users.map(createUserRow).join("");
 }
 
-async function handleAddClass(event) {
+async function handleAddOrUpdateClass(event) {
   event.preventDefault();
 
   const form = event.currentTarget;
@@ -164,8 +162,7 @@ async function handleAddClass(event) {
     instructor: document.getElementById("classInstructor").value.trim(),
     date: document.getElementById("classDate").value,
     time: document.getElementById("classTime").value,
-    max_capacity: Number(document.getElementById("classCapacity").value),
-    price: Number(document.getElementById("classPrice").value)
+    max_capacity: Number(document.getElementById("classCapacity").value)
   };
 
   if (!payload.name || !payload.instructor || !payload.date || !payload.time) {
@@ -178,31 +175,20 @@ async function handleAddClass(event) {
     return;
   }
 
-  if (payload.price < 0 || Number.isNaN(payload.price)) {
-    showMessage("Price must be a valid number.", "error");
-    return;
-  }
-
   try {
-    setButtonLoading(submitBtn, true, "Saving...");
+    const isEditing = Boolean(editingClassId);
+    setButtonLoading(submitBtn, true, isEditing ? "Updating..." : "Saving...");
 
-    let response = await fetch("/class", {
-      method: "POST",
+    const url = isEditing ? `/class/${editingClassId}` : "/class";
+    const method = isEditing ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
-
-    if (!response.ok) {
-      response = await fetch("/admin/classes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-    }
 
     let result = {};
     try {
@@ -210,17 +196,21 @@ async function handleAddClass(event) {
     } catch (error) {}
 
     if (!response.ok) {
-      throw new Error(result.message || "Failed to add class.");
+      throw new Error(result.message || `Failed to ${isEditing ? "update" : "add"} class.`);
     }
 
     form.reset();
-    showMessage("Class added successfully.", "success");
+    resetClassFormState();
+    showMessage(
+      isEditing ? "Class updated successfully." : "Class added successfully.",
+      "success"
+    );
     await refreshClassesAndOverview();
   } catch (error) {
-    console.error("handleAddClass error:", error);
-    showMessage(error.message || "Could not add class.", "error");
+    console.error("handleAddOrUpdateClass error:", error);
+    showMessage(error.message || "Could not save class.", "error");
   } finally {
-    setButtonLoading(submitBtn, false, "Add Class");
+    setButtonLoading(submitBtn, false, editingClassId ? "Update Class" : "Add Class");
   }
 }
 
@@ -238,15 +228,9 @@ async function handleClassTableClick(event) {
     if (!confirmed) return;
 
     try {
-      let response = await fetch(`/class/${classId}`, {
+      const response = await fetch(`/class/${classId}`, {
         method: "DELETE"
       });
-
-      if (!response.ok) {
-        response = await fetch(`/admin/classes/${classId}`, {
-          method: "DELETE"
-        });
-      }
 
       let result = {};
       try {
@@ -257,6 +241,11 @@ async function handleClassTableClick(event) {
         throw new Error(result.message || "Failed to delete class.");
       }
 
+      if (editingClassId === classId) {
+        resetClassFormState();
+        document.getElementById("addClassForm")?.reset();
+      }
+
       showMessage("Class deleted successfully.", "success");
       await refreshClassesAndOverview();
     } catch (error) {
@@ -265,56 +254,147 @@ async function handleClassTableClick(event) {
     }
   }
 
-  if (button.classList.contains("view")) {
-    showMessage("View action is ready for the next step.", "success");
+  if (button.classList.contains("edit")) {
+    populateClassFormFromRow(row);
+    showMessage("Class loaded into form. Make your changes and save.", "success");
   }
 
-  if (button.classList.contains("edit")) {
-    showMessage("Edit action is ready for the next step.", "success");
+  if (button.classList.contains("view")) {
+    const className = row.dataset.className || "Class";
+    const instructor = row.dataset.instructorName || "—";
+    const date = row.dataset.classDate || "—";
+    const startTime = row.dataset.startTime || "—";
+    const endTime = row.dataset.endTime || "—";
+    const capacity = Number(row.dataset.maxCapacity || 0);
+    const classBookings = latestBookings.filter(
+      (booking) => String(booking.class_ID) === String(classId)
+    );
+    const spotsLeft = Math.max(capacity - classBookings.length, 0);
+
+    const bookedNames = classBookings.length
+      ? classBookings
+          .map((booking) => `${booking.first_name || ""} ${booking.last_name || ""}`.trim())
+          .filter(Boolean)
+          .join(", ")
+      : "No one booked yet";
+
+    alert(
+      `Class: ${className}\n` +
+      `Instructor: ${instructor}\n` +
+      `Date: ${formatDate(date)}\n` +
+      `Time: ${formatTime(startTime)} - ${formatTime(endTime)}\n` +
+      `Capacity: ${capacity}\n` +
+      `Spots Left: ${spotsLeft}\n` +
+      `Booked Members: ${bookedNames}`
+    );
   }
 }
 
-function handleSavePricing(event) {
+function populateClassFormFromRow(row) {
+  editingClassId = row.dataset.id;
+
+  document.getElementById("className").value = row.dataset.className || "";
+  document.getElementById("classInstructor").value = row.dataset.instructorName || "";
+  document.getElementById("classDate").value = (row.dataset.classDate || "").slice(0, 10);
+  document.getElementById("classTime").value = (row.dataset.startTime || "").slice(0, 5);
+  document.getElementById("classCapacity").value = row.dataset.maxCapacity || "";
+
+  const submitBtn = document.getElementById("addClassSubmitBtn");
+  if (submitBtn) {
+    submitBtn.textContent = "Update Class";
+  }
+
+  const classesSection = document.getElementById("classes");
+  if (classesSection) {
+    classesSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function resetClassFormState() {
+  editingClassId = null;
+
+  const submitBtn = document.getElementById("addClassSubmitBtn");
+  if (submitBtn) {
+    submitBtn.textContent = "Add Class";
+    submitBtn.disabled = false;
+  }
+}
+
+async function handleSavePricing(event) {
   event.preventDefault();
 
-  const pricing = {
-    singleClassPrice: Number(document.getElementById("singleClassPrice").value),
-    starterPrice: Number(document.getElementById("starterPrice").value),
-    plusPrice: Number(document.getElementById("plusPrice").value),
-    unlimitedPrice: Number(document.getElementById("unlimitedPrice").value)
-  };
-
-  localStorage.setItem("adminPricing", JSON.stringify(pricing));
-  showMessage("Pricing saved locally. Connect this to a backend endpoint next.", "success");
-}
-
-function loadPricingForm() {
-  let pricing = DEFAULT_PRICING;
+  const pricing = [
+    {
+      pricing_key: "single-class",
+      price: Number(document.getElementById("singleClassPrice").value)
+    },
+    {
+      pricing_key: "starter",
+      price: Number(document.getElementById("starterPrice").value)
+    },
+    {
+      pricing_key: "plus",
+      price: Number(document.getElementById("plusPrice").value)
+    },
+    {
+      pricing_key: "unlimited",
+      price: Number(document.getElementById("unlimitedPrice").value)
+    }
+  ];
 
   try {
-    const saved = JSON.parse(localStorage.getItem("adminPricing"));
-    if (saved) {
-      pricing = { ...DEFAULT_PRICING, ...saved };
+    const res = await fetch("/pricing", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(pricing)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to update pricing");
     }
-  } catch (error) {
-    console.error("Could not load pricing from localStorage:", error);
+
+    showMessage("Pricing updated successfully!", "success");
+  } catch (err) {
+    console.error(err);
+    showMessage("Error updating pricing", "error");
   }
+}
 
-  const singleClassPrice = document.getElementById("singleClassPrice");
-  const starterPrice = document.getElementById("starterPrice");
-  const plusPrice = document.getElementById("plusPrice");
-  const unlimitedPrice = document.getElementById("unlimitedPrice");
+async function loadPricingForm() {
+  try {
+    const res = await fetch("/pricing");
+    const data = await res.json();
 
-  if (singleClassPrice) singleClassPrice.value = pricing.singleClassPrice;
-  if (starterPrice) starterPrice.value = pricing.starterPrice;
-  if (plusPrice) plusPrice.value = pricing.plusPrice;
-  if (unlimitedPrice) unlimitedPrice.value = pricing.unlimitedPrice;
+    if (!data.ok) return;
+
+    data.pricing.forEach((p) => {
+      if (p.pricing_key === "single-class") {
+        document.getElementById("singleClassPrice").value = p.price;
+      }
+      if (p.pricing_key === "starter") {
+        document.getElementById("starterPrice").value = p.price;
+      }
+      if (p.pricing_key === "plus") {
+        document.getElementById("plusPrice").value = p.price;
+      }
+      if (p.pricing_key === "unlimited") {
+        document.getElementById("unlimitedPrice").value = p.price;
+      }
+    });
+  } catch (err) {
+    console.error("Failed to load pricing", err);
+  }
 }
 
 function handleAdminLogout() {
   localStorage.removeItem("loggedInUser");
-  localStorage.removeItem("isLoggedIn");
   localStorage.removeItem("userEmail");
+  localStorage.removeItem("selectedPlan");
+  localStorage.removeItem("membershipActive");
   window.location.href = "login.html";
 }
 
@@ -325,27 +405,40 @@ async function refreshClassesAndOverview() {
     fetchBookings()
   ]);
 
-  renderClasses(classes);
+  latestBookings = bookings;
+  renderClasses(classes, bookings);
   renderOverview(users, classes, bookings);
 }
 
-function createClassRow(classItem) {
-  const classId = classItem.class_ID || classItem.id || "";
-  const name = escapeHTML(classItem.name || "Unnamed");
-  const instructor = escapeHTML(classItem.instructor || "—");
-  const date = formatDate(classItem.date);
-  const time = formatTime(classItem.time);
-  const capacity = escapeHTML(classItem.max_capacity ?? classItem.capacity ?? "—");
-  const price = formatCurrency(classItem.price);
+function createClassRow(classItem, bookings = []) {
+  const classId = classItem.class_ID || "";
+  const name = escapeHTML(classItem.class_name || "Unnamed");
+  const instructor = escapeHTML(classItem.instructor_name || "—");
+  const date = formatDate(classItem.class_date);
+  const time = `${formatTime(classItem.start_time)} - ${formatTime(classItem.end_time)}`;
+  const capacity = Number(classItem.max_capacity ?? 0);
+
+  const classBookings = bookings.filter(
+    (booking) => String(booking.class_ID) === String(classId)
+  );
+  const spotsLeft = Math.max(capacity - classBookings.length, 0);
 
   return `
-    <tr data-id="${escapeHTML(classId)}">
+    <tr
+      data-id="${escapeHTML(classId)}"
+      data-class-name="${escapeHTML(classItem.class_name || "")}"
+      data-instructor-name="${escapeHTML(classItem.instructor_name || "")}"
+      data-class-date="${escapeHTML((classItem.class_date || "").toString().slice(0, 10))}"
+      data-start-time="${escapeHTML((classItem.start_time || "").toString().slice(0, 5))}"
+      data-end-time="${escapeHTML((classItem.end_time || "").toString().slice(0, 5))}"
+      data-max-capacity="${escapeHTML(classItem.max_capacity ?? "")}"
+    >
       <td>${name}</td>
       <td>${instructor}</td>
       <td>${date}</td>
       <td>${time}</td>
       <td>${capacity}</td>
-      <td>${price}</td>
+      <td>${spotsLeft}</td>
       <td>
         <div class="admin-action-group">
           <button type="button" class="admin-mini-btn view">View</button>
@@ -435,16 +528,6 @@ function formatTime(value) {
   return date.toLocaleTimeString([], {
     hour: "numeric",
     minute: "2-digit"
-  });
-}
-
-function formatCurrency(value) {
-  const amount = Number(value);
-  if (Number.isNaN(amount)) return "—";
-
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD"
   });
 }
 

@@ -41,6 +41,29 @@ async function requireAuth() {
   }
 }
 
+async function requireAdmin() {
+  const user = getStoredUser();
+
+  if (!user || !user.user_ID) {
+    window.location.href = "/login.html?redirect=admin.html";
+    return;
+  }
+
+  try {
+    const res = await fetch(`/users/me?user_ID=${user.user_ID}`);
+    const data = await res.json();
+
+    if (!data.ok || !data.user || !data.user.isAdmin) {
+      alert("You do not have access to the admin page.");
+      window.location.href = "/index.html";
+      return;
+    }
+  } catch (err) {
+    console.error("Admin auth check failed:", err);
+    window.location.href = "/index.html";
+  }
+}
+
 function logout() {
   localStorage.removeItem("loggedInUser");
   localStorage.removeItem("userEmail");
@@ -64,6 +87,12 @@ async function renderAuthMenu() {
 
   const user = getStoredUser();
 
+  // Remove any previously injected admin link first
+  const oldAdminLink = document.getElementById("adminNavLink");
+  if (oldAdminLink) {
+    oldAdminLink.remove();
+  }
+
   if (!user || !user.user_ID) {
     loginLink.style.display = "inline-flex";
     userStatus.textContent = "";
@@ -78,7 +107,22 @@ async function renderAuthMenu() {
 
     if (data.ok && data.user) {
       loginLink.style.display = "none";
-      userStatus.textContent = `Hi, ${data.user.firstName}`;
+
+      if (data.user.isAdmin) {
+        userStatus.textContent = `Hi, ${data.user.firstName} (Admin)`;
+
+        const adminLink = document.createElement("a");
+        adminLink.id = "adminNavLink";
+        adminLink.href = "/admin.html";
+        adminLink.textContent = "Admin Panel";
+        adminLink.style.display = "inline-flex";
+        adminLink.style.fontWeight = "700";
+
+        logoutBtn.parentNode.insertBefore(adminLink, logoutBtn);
+      } else {
+        userStatus.textContent = `Hi, ${data.user.firstName}`;
+      }
+
       userStatus.style.display = "inline-flex";
       logoutBtn.style.display = "inline-flex";
     } else {

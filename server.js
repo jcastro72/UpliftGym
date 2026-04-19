@@ -14,6 +14,7 @@ const path = require('path');
 const usersRoutes = require('./routes/usersRoutes');
 const bookingsRoutes = require('./routes/bookingsRoutes');
 const classRoutes = require('./routes/classRoutes');
+const pricingRoutes = require('./routes/pricingRoutes');
 
 // Import the database connection from db.js
 // This is required if you want to keep routes like /test-db and /db-health
@@ -53,6 +54,7 @@ app.use(express.json());
 app.use('/users', usersRoutes);
 app.use('/bookings', bookingsRoutes);
 app.use('/class', classRoutes);
+app.use('/pricing', pricingRoutes);
 
 // Optional test route to check database connection
 // Only works if you import `db` from db.js

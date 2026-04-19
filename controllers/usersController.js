@@ -42,9 +42,10 @@ function createUser(req, res) {
       zip,
       phone,
       membershipActive,
-      selectedPlan
+      selectedPlan,
+      isAdmin
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -61,7 +62,8 @@ function createUser(req, res) {
       zip,
       phone,
       false,
-      null
+      null,
+      false
     ],
     (err, result) => {
       if (err) {
@@ -82,7 +84,8 @@ function createUser(req, res) {
           zip,
           phone,
           membershipActive: false,
-          selectedPlan: null
+          selectedPlan: null,
+          isAdmin: false
         }
       });
     }
@@ -123,7 +126,8 @@ function loginUser(req, res) {
         state: user.state,
         zip: user.zip,
         membershipActive: !!user.membershipActive,
-        selectedPlan: user.selectedPlan
+        selectedPlan: user.selectedPlan,
+        isAdmin: !!user.isAdmin
       }
     });
   });
@@ -138,7 +142,7 @@ function getCurrentUser(req, res) {
   }
 
   const sql = `
-    SELECT user_ID, first_name, last_name, email, street, city, state, zip, membershipActive, selectedPlan
+    SELECT user_ID, first_name, last_name, email, street, city, state, zip, membershipActive, selectedPlan, isAdmin
     FROM users
     WHERE user_ID = ?
   `;
@@ -166,7 +170,8 @@ function getCurrentUser(req, res) {
         state: dbUser.state,
         zip: dbUser.zip,
         membershipActive: !!dbUser.membershipActive,
-        selectedPlan: dbUser.selectedPlan
+        selectedPlan: dbUser.selectedPlan,
+        isAdmin: !!dbUser.isAdmin
       }
     });
   });
