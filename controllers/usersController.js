@@ -177,6 +177,33 @@ function getCurrentUser(req, res) {
   });
 }
 
+// UPDATE user profile
+function updateProfile(req, res) {
+  const { user_ID, first_name, last_name, phone, dob, street, city, state, zip } = req.body;
+
+  if (!user_ID) {
+    return res.status(400).json({ ok: false, message: "user_ID is required" });
+  }
+
+  const sql = `
+    UPDATE users
+    SET first_name = ?, last_name = ?, phone = ?, dob = ?, street = ?, city = ?, state = ?, zip = ?
+    WHERE user_ID = ?
+  `;
+
+  db.query(sql, [first_name, last_name, phone, dob, street, city, state, zip, user_ID], (err, result) => {
+    if (err) {
+      return res.status(500).json({ ok: false, message: err.message });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ ok: false, message: "User not found" });
+    }
+
+    res.json({ ok: true, message: "Profile updated successfully" });
+  });
+}
+
 // UPDATE membership
 function updateMembership(req, res) {
   const { user_ID, membershipActive, selectedPlan } = req.body;
@@ -212,5 +239,6 @@ module.exports = {
   createUser,
   loginUser,
   getCurrentUser,
+  updateProfile,
   updateMembership
 };

@@ -87,10 +87,15 @@ async function renderAuthMenu() {
 
   const user = getStoredUser();
 
-  // Remove any previously injected admin link first
+  // Remove any previously injected admin/profile links first
   const oldAdminLink = document.getElementById("adminNavLink");
   if (oldAdminLink) {
     oldAdminLink.remove();
+  }
+
+  const oldProfileLinkTop = document.getElementById("profileNavLink");
+  if (oldProfileLinkTop) {
+    oldProfileLinkTop.remove();
   }
 
   if (!user || !user.user_ID) {
@@ -107,6 +112,14 @@ async function renderAuthMenu() {
 
     if (data.ok && data.user) {
       loginLink.style.display = "none";
+
+      // Add profile link
+      const profileLink = document.createElement("a");
+      profileLink.id = "profileNavLink";
+      profileLink.href = "/profile.html";
+      profileLink.textContent = "My Profile";
+      profileLink.style.display = "inline-flex";
+      logoutBtn.parentNode.insertBefore(profileLink, logoutBtn);
 
       if (data.user.isAdmin) {
         userStatus.textContent = `Hi, ${data.user.firstName} (Admin)`;
