@@ -64,8 +64,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function formatDate(dateString) {
-    const date = new Date(dateString + "T00:00:00");
-    return date.toLocaleDateString();
+    if (!dateString) return "Date unavailable";
+  
+    const cleanDate = String(dateString).slice(0, 10);
+    const [year, month, day] = cleanDate.split("-");
+  
+    if (!year || !month || !day) {
+      return "Invalid date";
+    }
+  
+    return `${month}/${day}/${year}`;
   }
 
   function formatTime(timeString) {
