@@ -42,10 +42,9 @@ function createUser(req, res) {
       zip,
       phone,
       membershipActive,
-      selectedPlan,
-      isAdmin
+      selectedPlan
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -62,8 +61,7 @@ function createUser(req, res) {
       zip,
       phone,
       false,
-      null,
-      false
+      null
     ],
     (err, result) => {
       if (err) {
